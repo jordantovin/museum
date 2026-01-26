@@ -75,163 +75,156 @@ const FORM_FIELDS = {
     ]
 };
 
-// DOM Elements
-const elements = {
-    addBtn: document.getElementById('addBtn'),
-    editBtn: document.getElementById('editBtn'),
-    filterBtn: document.getElementById('filterBtn'),
-    tileTypeMenu: document.getElementById('tileTypeMenu'),
-    filterMenu: document.getElementById('filterMenu'),
-    addTileModal: document.getElementById('addTileModal'),
-    tileForm: document.getElementById('tileForm'),
-    formFields: document.getElementById('formFields'),
-    modalTitle: document.getElementById('modalTitle'),
-    tileGrid: document.getElementById('tileGrid'),
-    toggleBorders: document.getElementById('toggleBorders')
-};
+// Initialize when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initApp);
+} else {
+    initApp();
+}
 
-// Initialize
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM loaded');
-    console.log('Add button:', elements.addBtn);
-    console.log('Filter button:', elements.filterBtn);
-    console.log('Tile type menu:', elements.tileTypeMenu);
-    console.log('Filter menu:', elements.filterMenu);
+function initApp() {
+    console.log('Initializing Museum...');
     
-    if (!elements.addBtn) {
-        console.error('Add button not found!');
-        return;
-    }
+    // Get DOM elements
+    const addBtn = document.getElementById('addBtn');
+    const editBtn = document.getElementById('editBtn');
+    const filterBtn = document.getElementById('filterBtn');
+    const tileTypeMenu = document.getElementById('tileTypeMenu');
+    const filterMenu = document.getElementById('filterMenu');
+    const addTileModal = document.getElementById('addTileModal');
+    const tileForm = document.getElementById('tileForm');
+    const tileGrid = document.getElementById('tileGrid');
+    const toggleBorders = document.getElementById('toggleBorders');
     
-    initializeEventListeners();
-    loadTilesFromStorage();
-    renderTiles();
-});
-
-// Event Listeners
-function initializeEventListeners() {
-    // Header buttons
-    console.log('Attaching event listeners...');
+    console.log('Elements found:', {
+        addBtn: !!addBtn,
+        editBtn: !!editBtn,
+        filterBtn: !!filterBtn,
+        tileTypeMenu: !!tileTypeMenu,
+        filterMenu: !!filterMenu
+    });
     
-    if (elements.addBtn) {
-        elements.addBtn.addEventListener('click', (e) => {
-            console.log('Add button clicked!');
-            toggleTileTypeMenu(e);
+    // Add button - toggle tile type menu
+    if (addBtn) {
+        addBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            console.log('Add button clicked');
+            tileTypeMenu.classList.toggle('hidden');
+            filterMenu.classList.add('hidden');
         });
     }
     
-    if (elements.editBtn) {
-        elements.editBtn.addEventListener('click', toggleEditMode);
-    }
-    
-    if (elements.filterBtn) {
-        elements.filterBtn.addEventListener('click', (e) => {
-            console.log('Filter button clicked!');
-            toggleFilterMenu(e);
+    // Filter button - toggle filter menu
+    if (filterBtn) {
+        filterBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            console.log('Filter button clicked');
+            filterMenu.classList.toggle('hidden');
+            tileTypeMenu.classList.add('hidden');
         });
     }
-
-    // Tile type selection
+    
+    // Edit button - toggle edit mode
+    if (editBtn) {
+        editBtn.addEventListener('click', function() {
+            STATE.editMode = !STATE.editMode;
+            editBtn.classList.toggle('active');
+            
+            const tiles = tileGrid.querySelectorAll('.tile');
+            tiles.forEach(tile => {
+                if (STATE.editMode) {
+                    tile.classList.add('edit-mode');
+                    tile.draggable = true;
+                } else {
+                    tile.classList.remove('edit-mode');
+                    tile.draggable = false;
+                }
+            });
+        });
+    }
+    
+    // Tile type options
     document.querySelectorAll('.tile-type-option').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            STATE.selectedTileType = e.target.dataset.type;
+        btn.addEventListener('click', function() {
+            STATE.selectedTileType = this.dataset.type;
+            tileTypeMenu.classList.add('hidden');
             showAddTileModal();
         });
     });
-
+    
     // Filter options
     document.querySelectorAll('.filter-option').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            if (e.target.dataset.sort) {
-                STATE.currentSort = e.target.dataset.sort;
-            } else if (e.target.dataset.filter) {
-                STATE.currentFilter = e.target.dataset.filter;
+        btn.addEventListener('click', function() {
+            if (this.dataset.sort) {
+                STATE.currentSort = this.dataset.sort;
+            } else if (this.dataset.filter) {
+                STATE.currentFilter = this.dataset.filter;
             }
             renderTiles();
-            toggleFilterMenu();
+            filterMenu.classList.add('hidden');
         });
     });
-
-    // Border toggle
-    elements.toggleBorders.addEventListener('change', (e) => {
-        if (e.target.checked) {
-            elements.tileGrid.classList.remove('no-borders');
-        } else {
-            elements.tileGrid.classList.add('no-borders');
-        }
-    });
-
-    // Modal close
-    document.querySelector('.close-modal').addEventListener('click', closeModal);
-    document.querySelector('.cancel-btn').addEventListener('click', closeModal);
-    elements.addTileModal.addEventListener('click', (e) => {
-        if (e.target === elements.addTileModal) closeModal();
-    });
-
-    // Form submission
-    elements.tileForm.addEventListener('submit', handleFormSubmit);
-
-    // Close menus when clicking outside
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.header-btn') && !e.target.closest('.tile-type-menu')) {
-            elements.tileTypeMenu.classList.add('hidden');
-        }
-        if (!e.target.closest('#filterBtn') && !e.target.closest('.filter-menu')) {
-            elements.filterMenu.classList.add('hidden');
-        }
-    });
-}
-
-// Toggle Functions
-function toggleTileTypeMenu(e) {
-    e.stopPropagation();
-    console.log('Toggle tile type menu', elements.tileTypeMenu);
-    elements.tileTypeMenu.classList.toggle('hidden');
-    elements.filterMenu.classList.add('hidden');
-    console.log('Menu hidden class:', elements.tileTypeMenu.classList.contains('hidden'));
-}
-
-function toggleFilterMenu(e) {
-    e.stopPropagation();
-    console.log('Toggle filter menu', elements.filterMenu);
-    elements.filterMenu.classList.toggle('hidden');
-    elements.tileTypeMenu.classList.add('hidden');
-    console.log('Menu hidden class:', elements.filterMenu.classList.contains('hidden'));
-}
-
-function toggleEditMode() {
-    STATE.editMode = !STATE.editMode;
-    elements.editBtn.classList.toggle('active');
     
-    if (STATE.editMode) {
-        elements.tileGrid.querySelectorAll('.tile').forEach(tile => {
-            tile.classList.add('edit-mode');
-            tile.draggable = true;
-        });
-    } else {
-        elements.tileGrid.querySelectorAll('.tile').forEach(tile => {
-            tile.classList.remove('edit-mode');
-            tile.draggable = false;
+    // Border toggle
+    if (toggleBorders) {
+        toggleBorders.addEventListener('change', function() {
+            if (this.checked) {
+                tileGrid.classList.remove('no-borders');
+            } else {
+                tileGrid.classList.add('no-borders');
+            }
         });
     }
+    
+    // Close modal
+    document.querySelector('.close-modal').addEventListener('click', closeModal);
+    document.querySelector('.cancel-btn').addEventListener('click', closeModal);
+    addTileModal.addEventListener('click', function(e) {
+        if (e.target === addTileModal) closeModal();
+    });
+    
+    // Form submission
+    tileForm.addEventListener('submit', handleFormSubmit);
+    
+    // Close menus when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.header-right') && !e.target.closest('.tile-type-menu')) {
+            tileTypeMenu.classList.add('hidden');
+        }
+        if (!e.target.closest('#filterBtn') && !e.target.closest('.filter-menu')) {
+            filterMenu.classList.add('hidden');
+        }
+    });
+    
+    // Load and render initial tiles
+    loadTilesFromStorage();
+    renderTiles();
+    
+    console.log('Museum initialized successfully');
 }
 
 // Modal Functions
 function showAddTileModal() {
-    elements.tileTypeMenu.classList.add('hidden');
-    elements.modalTitle.textContent = `Add ${STATE.selectedTileType.charAt(0).toUpperCase() + STATE.selectedTileType.slice(1)}`;
+    const modal = document.getElementById('addTileModal');
+    const modalTitle = document.getElementById('modalTitle');
+    
+    modalTitle.textContent = `Add ${STATE.selectedTileType.charAt(0).toUpperCase() + STATE.selectedTileType.slice(1)}`;
     generateFormFields();
-    elements.addTileModal.classList.remove('hidden');
+    modal.classList.remove('hidden');
 }
 
 function closeModal() {
-    elements.addTileModal.classList.add('hidden');
-    elements.tileForm.reset();
+    const modal = document.getElementById('addTileModal');
+    const form = document.getElementById('tileForm');
+    
+    modal.classList.add('hidden');
+    form.reset();
     STATE.selectedTileType = null;
     STATE.selectedSize = '1x1';
 }
 
 function generateFormFields() {
+    const formFields = document.getElementById('formFields');
     const fields = FORM_FIELDS[STATE.selectedTileType];
     let html = '';
 
@@ -249,15 +242,15 @@ function generateFormFields() {
         `;
     });
 
-    elements.formFields.innerHTML = html;
+    formFields.innerHTML = html;
 
     // Add size selector event listeners
     document.querySelectorAll('.size-option').forEach(btn => {
-        btn.addEventListener('click', (e) => {
+        btn.addEventListener('click', function(e) {
             e.preventDefault();
             document.querySelectorAll('.size-option').forEach(b => b.classList.remove('selected'));
-            btn.classList.add('selected');
-            STATE.selectedSize = btn.dataset.size;
+            this.classList.add('selected');
+            STATE.selectedSize = this.dataset.size;
         });
     });
 
@@ -285,7 +278,7 @@ async function handleFormSubmit(e) {
     // Add to state
     STATE.tiles.push(tileData);
 
-    // Save to localStorage (temporary until Google Sheets integration)
+    // Save to localStorage
     saveTilesToStorage();
 
     // Save to Google Sheets
@@ -298,9 +291,6 @@ async function handleFormSubmit(e) {
 
 // Google Sheets Integration
 async function saveTileToSheets(tileData) {
-    // This function will send data to Google Sheets
-    // You'll need to set up a Google Apps Script Web App to receive this data
-    
     try {
         const response = await fetch(CONFIG.sheetsUrl, {
             method: 'POST',
@@ -318,9 +308,6 @@ async function saveTileToSheets(tileData) {
 }
 
 async function loadTilesFromSheets() {
-    // This function will load data from Google Sheets
-    // You'll need to set up a Google Apps Script Web App to serve this data
-    
     try {
         const response = await fetch(CONFIG.sheetsUrl);
         const data = await response.json();
@@ -331,7 +318,7 @@ async function loadTilesFromSheets() {
     }
 }
 
-// Local Storage Functions (fallback/cache)
+// Local Storage Functions
 function saveTilesToStorage() {
     localStorage.setItem('museumTiles', JSON.stringify(STATE.tiles));
 }
@@ -345,6 +332,7 @@ function loadTilesFromStorage() {
 
 // Tile Rendering
 function renderTiles() {
+    const tileGrid = document.getElementById('tileGrid');
     let tilesToRender = [...STATE.tiles];
 
     // Apply filter
@@ -358,18 +346,17 @@ function renderTiles() {
     } else if (STATE.currentSort === 'oldest') {
         tilesToRender.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
     }
-    // 'custom' uses the current order
 
     // Render
-    elements.tileGrid.innerHTML = '';
+    tileGrid.innerHTML = '';
     tilesToRender.forEach(tile => {
         const tileElement = createTileElement(tile);
-        elements.tileGrid.appendChild(tileElement);
+        tileGrid.appendChild(tileElement);
     });
 
     // Re-apply edit mode if active
     if (STATE.editMode) {
-        elements.tileGrid.querySelectorAll('.tile').forEach(tile => {
+        tileGrid.querySelectorAll('.tile').forEach(tile => {
             tile.classList.add('edit-mode');
             tile.draggable = true;
         });
@@ -442,13 +429,14 @@ function handleDragOver(e) {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
 
-    const afterElement = getDragAfterElement(elements.tileGrid, e.clientY);
+    const tileGrid = document.getElementById('tileGrid');
+    const afterElement = getDragAfterElement(tileGrid, e.clientY);
     const draggable = document.querySelector('.dragging');
     
     if (afterElement == null) {
-        elements.tileGrid.appendChild(draggable);
+        tileGrid.appendChild(draggable);
     } else {
-        elements.tileGrid.insertBefore(draggable, afterElement);
+        tileGrid.insertBefore(draggable, afterElement);
     }
 }
 
@@ -457,8 +445,10 @@ function handleDrop(e) {
     
     e.preventDefault();
     
+    const tileGrid = document.getElementById('tileGrid');
+    
     // Update tiles order in state
-    const newOrder = Array.from(elements.tileGrid.querySelectorAll('.tile')).map(tile => 
+    const newOrder = Array.from(tileGrid.querySelectorAll('.tile')).map(tile => 
         STATE.tiles.find(t => t.id === tile.dataset.id)
     );
     
