@@ -35,7 +35,7 @@ body {
     align-items: center;
     position: sticky;
     top: 0;
-    z-index: 100;
+    z-index: 9000;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
@@ -99,7 +99,7 @@ body {
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     padding: 8px;
-    z-index: 99;
+    z-index: 9500;
     min-width: 200px;
 }
 
@@ -179,7 +179,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1000;
+    z-index: 10000;
 }
 
 .modal.hidden {
