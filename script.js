@@ -109,6 +109,12 @@ function initApp() {
         addBtn.addEventListener('click', function(e) {
             e.stopPropagation();
             console.log('Add button clicked');
+            
+            // Position the menu
+            const rect = addBtn.getBoundingClientRect();
+            tileTypeMenu.style.top = (rect.bottom + 8) + 'px';
+            tileTypeMenu.style.right = (window.innerWidth - rect.right) + 'px';
+            
             tileTypeMenu.classList.toggle('hidden');
             filterMenu.classList.add('hidden');
         });
@@ -119,6 +125,12 @@ function initApp() {
         filterBtn.addEventListener('click', function(e) {
             e.stopPropagation();
             console.log('Filter button clicked');
+            
+            // Position the menu
+            const rect = filterBtn.getBoundingClientRect();
+            filterMenu.style.top = (rect.bottom + 8) + 'px';
+            filterMenu.style.right = (window.innerWidth - rect.right) + 'px';
+            
             filterMenu.classList.toggle('hidden');
             tileTypeMenu.classList.add('hidden');
         });
