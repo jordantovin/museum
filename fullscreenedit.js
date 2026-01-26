@@ -33,7 +33,13 @@ function initFullscreenAndEditing() {
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             fullscreenViewer.classList.add('hidden');
+            hideContextMenu();
         }
+    });
+    
+    // Close context menu when clicking anywhere
+    document.addEventListener('click', function() {
+        hideContextMenu();
     });
     
     console.log('Fullscreen and editing features initialized');
@@ -47,7 +53,9 @@ function addTileInteractions(div, tile, hasImage) {
         div.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            if (!STATE.editMode) {
+            if (!STATE.editMode && window.MUSEUM_ADMIN && window.MUSEUM_ADMIN.isLoggedIn()) {
+                showFullscreen(tile);
+            } else if (!STATE.editMode) {
                 showFullscreen(tile);
             }
         });
@@ -77,15 +85,55 @@ function addTileInteractions(div, tile, hasImage) {
         });
     }
 
-    // Right-click to edit any tile
+    // Right-click context menu (only for logged in users)
     div.addEventListener('contextmenu', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        editTile(tile);
+        if (window.MUSEUM_ADMIN && window.MUSEUM_ADMIN.isLoggedIn()) {
+            e.preventDefault();
+            e.stopPropagation();
+            showContextMenu(e, tile);
+        }
     });
 }
 
-// Fullscreen Viewer Function
+// Context Menu
+function showContextMenu(e, tile) {
+    hideContextMenu(); // Hide any existing menu
+    
+    const menu = document.createElement('div');
+    menu.id = 'tileContextMenu';
+    menu.className = 'context-menu';
+    menu.style.left = e.pageX + 'px';
+    menu.style.top = e.pageY + 'px';
+    
+    menu.innerHTML = `
+        <div class="context-menu-item" data-action="edit">Edit</div>
+        <div class="context-menu-item context-menu-item-danger" data-action="delete">Delete</div>
+    `;
+    
+    document.body.appendChild(menu);
+    
+    // Add click handlers
+    menu.querySelector('[data-action="edit"]').addEventListener('click', function(e) {
+        e.stopPropagation();
+        hideContextMenu();
+        editTile(tile);
+    });
+    
+    menu.querySelector('[data-action="delete"]').addEventListener('click', function(e) {
+        e.stopPropagation();
+        hideContextMenu();
+        deleteTile(tile);
+    });
+}
+
+function hideContextMenu() {
+    const existing = document.getElementById('tileContextMenu');
+    if (existing) {
+        existing.remove();
+    }
+}
+
+// Fullscreen Viewer Function - Horizontal Layout
 function showFullscreen(tile) {
     console.log('showFullscreen called with:', tile);
     const viewer = document.getElementById('fullscreenViewer');
@@ -96,32 +144,36 @@ function showFullscreen(tile) {
         return;
     }
     
-    let html = '';
+    let html = '<div class="fullscreen-horizontal">';
     
+    // Left side - Image
     if (tile.upload) {
-        html += `<img src="${tile.upload}" alt="${tile.title || ''}" class="fullscreen-image">`;
+        html += `<div class="fullscreen-image-container">
+            <img src="${tile.upload}" alt="${tile.title || ''}" class="fullscreen-image-horizontal">
+        </div>`;
     }
     
-    html += '<div class="fullscreen-info">';
+    // Right side - Info
+    html += '<div class="fullscreen-info-container">';
     
     if (tile.type === 'object') {
         if (tile.title) html += `<h2>${tile.title}</h2>`;
-        if (tile.date) html += `<p>${tile.date}</p>`;
-        if (tile.location) html += `<p>${tile.location}</p>`;
-        if (tile.coordinates) html += `<p>${tile.coordinates}</p>`;
+        if (tile.date) html += `<p><strong>Date:</strong> ${tile.date}</p>`;
+        if (tile.location) html += `<p><strong>Location:</strong> ${tile.location}</p>`;
+        if (tile.coordinates) html += `<p><strong>Coordinates:</strong> ${tile.coordinates}</p>`;
     } else if (tile.type === 'sticker') {
-        if (tile.date) html += `<p>${tile.date}</p>`;
-        if (tile.media) html += `<p>${tile.media}</p>`;
-        if (tile.location) html += `<p>${tile.location}</p>`;
-        if (tile.coordinates) html += `<p>${tile.coordinates}</p>`;
-        if (tile.artist) html += `<p>${tile.artist}</p>`;
+        if (tile.date) html += `<p><strong>Date:</strong> ${tile.date}</p>`;
+        if (tile.media) html += `<p><strong>Media:</strong> ${tile.media}</p>`;
+        if (tile.location) html += `<p><strong>Location:</strong> ${tile.location}</p>`;
+        if (tile.coordinates) html += `<p><strong>Coordinates:</strong> ${tile.coordinates}</p>`;
+        if (tile.artist) html += `<p><strong>Artist:</strong> ${tile.artist}</p>`;
     } else if (tile.type === 'art') {
         if (tile.title) html += `<h2>${tile.title}</h2>`;
-        if (tile.artist) html += `<p>${tile.artist}</p>`;
-        if (tile.date) html += `<p>${tile.date}</p>`;
+        if (tile.artist) html += `<p><strong>Artist:</strong> ${tile.artist}</p>`;
+        if (tile.date) html += `<p><strong>Date:</strong> ${tile.date}</p>`;
     }
     
-    html += '</div>';
+    html += '</div></div>';
     
     content.innerHTML = html;
     viewer.classList.remove('hidden');
@@ -161,9 +213,23 @@ function editTile(tile) {
     modal.classList.remove('hidden');
 }
 
+// Delete Tile Function
+function deleteTile(tile) {
+    if (confirm(`Are you sure you want to delete this ${tile.type}?`)) {
+        const index = STATE.tiles.findIndex(t => t.id === tile.id);
+        if (index > -1) {
+            STATE.tiles.splice(index, 1);
+            saveTilesToStorage();
+            renderTiles();
+            console.log('Tile deleted:', tile.id);
+        }
+    }
+}
+
 // Export functions for use in master script
 window.MUSEUM_FULLSCREEN = {
     showFullscreen,
     editTile,
+    deleteTile,
     addTileInteractions
 };
