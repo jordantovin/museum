@@ -37,6 +37,7 @@ body {
     top: 0;
     z-index: 9000;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    position: relative;
 }
 
 .header-left h1 {
@@ -91,9 +92,10 @@ body {
 /* Dropdown Menus */
 .tile-type-menu,
 .filter-menu {
-    position: fixed;
-    top: 72px;
+    position: absolute;
+    top: 100%;
     right: 24px;
+    margin-top: 4px;
     background: white;
     border: 1px solid var(--border-color);
     border-radius: 8px;
