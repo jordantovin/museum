@@ -93,7 +93,16 @@ const elements = {
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded');
-    console.log('Elements:', elements);
+    console.log('Add button:', elements.addBtn);
+    console.log('Filter button:', elements.filterBtn);
+    console.log('Tile type menu:', elements.tileTypeMenu);
+    console.log('Filter menu:', elements.filterMenu);
+    
+    if (!elements.addBtn) {
+        console.error('Add button not found!');
+        return;
+    }
+    
     initializeEventListeners();
     loadTilesFromStorage();
     renderTiles();
@@ -102,9 +111,25 @@ document.addEventListener('DOMContentLoaded', () => {
 // Event Listeners
 function initializeEventListeners() {
     // Header buttons
-    elements.addBtn.addEventListener('click', toggleTileTypeMenu);
-    elements.editBtn.addEventListener('click', toggleEditMode);
-    elements.filterBtn.addEventListener('click', toggleFilterMenu);
+    console.log('Attaching event listeners...');
+    
+    if (elements.addBtn) {
+        elements.addBtn.addEventListener('click', (e) => {
+            console.log('Add button clicked!');
+            toggleTileTypeMenu(e);
+        });
+    }
+    
+    if (elements.editBtn) {
+        elements.editBtn.addEventListener('click', toggleEditMode);
+    }
+    
+    if (elements.filterBtn) {
+        elements.filterBtn.addEventListener('click', (e) => {
+            console.log('Filter button clicked!');
+            toggleFilterMenu(e);
+        });
+    }
 
     // Tile type selection
     document.querySelectorAll('.tile-type-option').forEach(btn => {
