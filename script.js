@@ -4,7 +4,7 @@
 // Configuration
 const CONFIG = {
     csvUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTKj5a8JIDfxvaw-5pPEb5nHfu_a-jZS9lFgrHqvv6JjzCTbpmMTyxVxqF5yrZPjkH961zi-u_HvQwz/pub?output=csv',
-    webAppUrl: 'https://script.google.com/macros/s/AKfycbz6eCNVIg_AI5YsaSxukfRQXz-1oXcZuwm3xqEVceLQhaAMlX4UDRhmnI7j18Bq2cw/exec', // Replace with your deployed Web App URL from Google Apps Script
+    webAppUrl: 'YOUR_WEB_APP_URL_HERE', // Replace with your deployed Web App URL from Google Apps Script
     sheetNames: {
         object: 'Object',
         sticker: 'Sticker',
@@ -104,8 +104,8 @@ function initApp() {
         addBtn.addEventListener('click', function(e) {
             e.stopPropagation();
             const rect = addBtn.getBoundingClientRect();
-            tileTypeMenu.style.top = (rect.bottom + 8) + 'px';
-            tileTypeMenu.style.right = '24px';
+            tileTypeMenu.style.top = (rect.bottom + 16) + 'px';
+            tileTypeMenu.style.right = '16px';
             tileTypeMenu.classList.toggle('hidden');
             filterMenu.classList.add('hidden');
         });
@@ -116,8 +116,8 @@ function initApp() {
         filterBtn.addEventListener('click', function(e) {
             e.stopPropagation();
             const rect = filterBtn.getBoundingClientRect();
-            filterMenu.style.top = (rect.bottom + 8) + 'px';
-            filterMenu.style.right = '24px';
+            filterMenu.style.top = (rect.bottom + 16) + 'px';
+            filterMenu.style.right = '16px';
             filterMenu.classList.toggle('hidden');
             tileTypeMenu.classList.add('hidden');
         });
@@ -272,13 +272,19 @@ function generateFormFields() {
         });
     });
 
-    // Set default size
-    document.querySelector('.size-option[data-size="1x1"]').classList.add('selected');
+    // Don't set default size - user must choose
+    STATE.selectedSize = null;
 }
 
 // Form Submission
 async function handleFormSubmit(e) {
     e.preventDefault();
+
+    // Check if size is selected
+    if (!STATE.selectedSize) {
+        alert('Please select a tile size');
+        return;
+    }
 
     const formData = new FormData(e.target);
     const tileData = {
