@@ -1,5 +1,22 @@
 /* =========================================================
-   MUSEUM TILES — app.js
+   MUSEUM — script.js (GitHub Pages Safe Version)
+========================================================= */
+
+window.addEventListener("DOMContentLoaded", () => {
+
+console.log("Museum script loaded");
+
+/* =========================================================
+   CHECK GRIDSTACK
+========================================================= */
+
+if (typeof GridStack === "undefined") {
+  alert("GridStack not loaded. Check CDN.");
+  return;
+}
+
+/* =========================================================
+   STATE
 ========================================================= */
 
 let grid;
@@ -26,23 +43,27 @@ const sizeLabel = document.getElementById("sizeLabel");
 const sortSelect = document.getElementById("sortSelect");
 const typeSelect = document.getElementById("typeSelect");
 
+/* guard */
+if (!addBtn) {
+  alert("HTML IDs mismatch. addBtn missing.");
+  return;
+}
+
 /* =========================================================
-   INIT GRID
+   GRID INIT
 ========================================================= */
 
 grid = GridStack.init({
   cellHeight: 80,
   margin: 10,
   float: true,
-  disableResize: true,
-  draggable: { handle: ".gridstack-item-content" }
+  disableResize: true
 });
 
-/* start locked */
 grid.enableMove(false);
 
 /* =========================================================
-   UTIL
+   HELPERS
 ========================================================= */
 
 function save() {
@@ -60,7 +81,6 @@ function detectMedia(url) {
   if (["jpg","jpeg","png","webp","gif"].includes(ext)) return "image";
   if (["mp4","webm","mov"].includes(ext)) return "video";
   if (["glb","obj","fbx","stl"].includes(ext)) return "model";
-
   return "other";
 }
 
@@ -74,38 +94,31 @@ function renderTile(tile) {
   const mediaType = detectMedia(tile.mediaUrl);
 
   if (mediaType === "image") {
-    mediaHTML = `<img class="tileMedia" src="${tile.mediaUrl}" />`;
+    mediaHTML = `<img class="tileMedia" src="${tile.mediaUrl}">`;
   } else if (mediaType === "video") {
     mediaHTML = `
-      <video class="tileMedia" muted loop autoplay playsinline>
+      <video class="tileMedia" muted autoplay loop playsinline>
         <source src="${tile.mediaUrl}">
       </video>`;
   } else if (mediaType === "model") {
     mediaHTML = `<div class="tilePlaceholder">3D</div>`;
   } else {
-    mediaHTML = `<div class="tilePlaceholder">${tile.title || tile.firstName || "Media"}</div>`;
+    mediaHTML = `<div class="tilePlaceholder">${tile.title || tile.firstName || "Tile"}</div>`;
   }
-
-  const overlayTitle =
-    tile.title ||
-    tile.firstName ||
-    "";
 
   return `
     <div class="gridstack-item-content">
       ${mediaHTML}
       <div class="tileOverlay">
-        <div class="tileOverlay__title">${overlayTitle}</div>
+        <div class="tileOverlay__title">${tile.title || tile.firstName || ""}</div>
         <div class="tileOverlay__meta">${tile.type}</div>
       </div>
     </div>
   `;
 }
 
-function addTileToGrid(tile) {
+function addTile(tile) {
   grid.addWidget({
-    x: tile.x || 0,
-    y: tile.y || 0,
     w: tile.w,
     h: tile.h,
     content: renderTile(tile),
@@ -114,18 +127,19 @@ function addTileToGrid(tile) {
 }
 
 /* =========================================================
-   LOAD EXISTING
+   LOAD SAVED
 ========================================================= */
 
-tiles.forEach(t => addTileToGrid(t));
+tiles.forEach(addTile);
 
 /* =========================================================
-   MENU
+   ADD MENU
 ========================================================= */
 
-addBtn.onclick = () => {
+addBtn.addEventListener("click", () => {
+  console.log("+ clicked");
   addMenu.classList.toggle("is-open");
-};
+});
 
 document.addEventListener("click", e => {
   if (!addBtn.contains(e.target) && !addMenu.contains(e.target)) {
@@ -139,14 +153,15 @@ document.addEventListener("click", e => {
 
 function openPanel(type) {
   currentType = type;
+
   panel.classList.add("is-open");
   backdrop.hidden = false;
 
-  panelTitle.textContent = `New ${type}`;
+  panelTitle.textContent = "New " + type;
   panelSubtitle.textContent = "Fill out the form";
 
   dynamicFields.innerHTML = "";
-  const tpl = document.getElementById(`tpl-${type}`);
+  const tpl = document.getElementById("tpl-" + type);
   dynamicFields.append(tpl.content.cloneNode(true));
 }
 
@@ -159,7 +174,9 @@ function closePanel() {
 closePanelBtn.onclick = closePanel;
 backdrop.onclick = closePanel;
 
-/* menu selections */
+/* =========================================================
+   TYPE SELECT
+========================================================= */
 
 document.querySelectorAll(".menu__item").forEach(btn => {
   btn.onclick = () => {
@@ -178,8 +195,8 @@ document.querySelectorAll(".size").forEach(btn => {
     btn.classList.add("is-selected");
 
     selectedSize = {
-      w: parseInt(btn.dataset.w),
-      h: parseInt(btn.dataset.h)
+      w: Number(btn.dataset.w),
+      h: Number(btn.dataset.h)
     };
 
     sizeLabel.textContent = `${selectedSize.w / 2} × ${selectedSize.h / 2}`;
@@ -207,8 +224,7 @@ tileForm.onsubmit = e => {
 
   tiles.push(tile);
   save();
-
-  addTileToGrid(tile);
+  addTile(tile);
   closePanel();
 };
 
@@ -233,22 +249,21 @@ toggleBordersBtn.onclick = () => {
 };
 
 /* =========================================================
-   SORTING
+   SORT
 ========================================================= */
 
 sortSelect.onchange = () => {
-  const mode = sortSelect.value;
-
-  if (mode === "custom") return;
+  if (sortSelect.value === "custom") return;
 
   grid.removeAll(false);
 
   const sorted = [...tiles].sort((a,b)=>{
-    if (mode === "newest") return new Date(b.created) - new Date(a.created);
-    if (mode === "oldest") return new Date(a.created) - new Date(b.created);
+    return sortSelect.value === "newest"
+      ? new Date(b.created) - new Date(a.created)
+      : new Date(a.created) - new Date(b.created);
   });
 
-  sorted.forEach(addTileToGrid);
+  sorted.forEach(addTile);
 };
 
 /* =========================================================
@@ -256,17 +271,14 @@ sortSelect.onchange = () => {
 ========================================================= */
 
 typeSelect.onchange = () => {
-  const type = typeSelect.value;
-
   grid.removeAll(false);
-
   tiles
-    .filter(t => type === "all" ? true : t.type === type)
-    .forEach(addTileToGrid);
+    .filter(t => typeSelect.value === "all" || t.type === typeSelect.value)
+    .forEach(addTile);
 };
 
 /* =========================================================
-   PERSIST POSITIONS
+   SAVE POSITIONS
 ========================================================= */
 
 grid.on("change", (e, items) => {
@@ -277,4 +289,6 @@ grid.on("change", (e, items) => {
     t.y = i.y;
   });
   save();
+});
+
 });
