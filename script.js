@@ -208,6 +208,31 @@ function initApp() {
         }
     });
     
+    // Fullscreen viewer close
+    const fullscreenViewer = document.getElementById('fullscreenViewer');
+    const fullscreenClose = document.querySelector('.fullscreen-close');
+    
+    if (fullscreenClose) {
+        fullscreenClose.addEventListener('click', function() {
+            fullscreenViewer.classList.add('hidden');
+        });
+    }
+    
+    if (fullscreenViewer) {
+        fullscreenViewer.addEventListener('click', function(e) {
+            if (e.target === fullscreenViewer) {
+                fullscreenViewer.classList.add('hidden');
+            }
+        });
+    }
+    
+    // ESC key to close fullscreen
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            fullscreenViewer.classList.add('hidden');
+        }
+    });
+    
     // Load and render initial tiles
     loadTilesFromStorage();
     renderTiles();
@@ -384,15 +409,49 @@ function createTileElement(tile) {
 
     // Determine what to display
     const hasImage = tile.upload && tile.upload.trim() !== '';
-    const displayTitle = tile.title || tile.firstName ? `${tile.firstName || ''} ${tile.lastName || ''}`.trim() : '';
+    
+    // Build display title based on tile type
+    let displayTitle = '';
+    if (tile.type === 'name') {
+        displayTitle = `${tile.firstName || ''} ${tile.lastName || ''}`.trim();
+    } else {
+        displayTitle = tile.title || '';
+    }
+
+    // Build hover overlay content based on tile type
+    let overlayContent = '';
+    
+    if (tile.type === 'object') {
+        overlayContent = `
+            <div class="tile-overlay-title">${tile.title || ''}</div>
+            <div class="tile-overlay-meta">${tile.date || ''}</div>
+        `;
+    } else if (tile.type === 'sticker') {
+        overlayContent = `
+            <div class="tile-overlay-title">${tile.location || ''}</div>
+            <div class="tile-overlay-meta">${tile.date || ''}</div>
+        `;
+    } else if (tile.type === 'name') {
+        overlayContent = ''; // Just opacity, no text
+    } else if (tile.type === 'art') {
+        overlayContent = `
+            <div class="tile-overlay-title">${tile.title || ''}</div>
+            <div class="tile-overlay-meta">${tile.artist || ''}</div>
+        `;
+    } else if (tile.type === 'inspiration') {
+        if (hasImage) {
+            overlayContent = `<div class="tile-overlay-title">${tile.title || ''}</div>`;
+        }
+    } else if (tile.type === 'place') {
+        overlayContent = `<div class="tile-overlay-title">${tile.title || ''}</div>`;
+    } else if (tile.type === 'post') {
+        overlayContent = `<div class="tile-overlay-title">${tile.title || ''}</div>`;
+    }
 
     if (hasImage) {
         div.innerHTML = `
             <img src="${tile.upload}" alt="${displayTitle}" class="tile-image">
-            <div class="tile-overlay">
-                <div class="tile-overlay-title">${displayTitle}</div>
-                <div class="tile-overlay-meta">${getTileMetadata(tile)}</div>
-            </div>
+            <div class="tile-overlay">${overlayContent}</div>
         `;
     } else {
         div.innerHTML = `
@@ -400,6 +459,30 @@ function createTileElement(tile) {
                 <h3>${displayTitle}</h3>
             </div>
         `;
+    }
+
+    // Add click handler for fullscreen (object, art, sticker types only)
+    if ((tile.type === 'object' || tile.type === 'art' || tile.type === 'sticker') && hasImage) {
+        div.style.cursor = 'pointer';
+        div.addEventListener('click', function() {
+            showFullscreen(tile);
+        });
+    }
+
+    // Add click handler for Name tiles with website links
+    if (tile.type === 'name' && tile.website) {
+        div.style.cursor = 'pointer';
+        div.addEventListener('click', function() {
+            window.open(tile.website, '_blank');
+        });
+    }
+
+    // Add click handler for tiles with link field
+    if ((tile.type === 'inspiration' || tile.type === 'place' || tile.type === 'post') && tile.link) {
+        div.style.cursor = 'pointer';
+        div.addEventListener('click', function() {
+            window.open(tile.link, '_blank');
+        });
     }
 
     // Add drag event listeners
@@ -420,6 +503,42 @@ function getTileMetadata(tile) {
     if (tile.type) parts.push(tile.type);
 
     return parts.join(' • ');
+}
+
+// Fullscreen Viewer Function
+function showFullscreen(tile) {
+    const viewer = document.getElementById('fullscreenViewer');
+    const content = document.getElementById('fullscreenContent');
+    
+    let html = '';
+    
+    if (tile.upload) {
+        html += `<img src="${tile.upload}" alt="${tile.title || ''}" class="fullscreen-image">`;
+    }
+    
+    html += '<div class="fullscreen-info">';
+    
+    if (tile.type === 'object') {
+        if (tile.title) html += `<h2>${tile.title}</h2>`;
+        if (tile.date) html += `<p>${tile.date}</p>`;
+        if (tile.location) html += `<p>${tile.location}</p>`;
+        if (tile.coordinates) html += `<p>${tile.coordinates}</p>`;
+    } else if (tile.type === 'sticker') {
+        if (tile.date) html += `<p>${tile.date}</p>`;
+        if (tile.media) html += `<p>${tile.media}</p>`;
+        if (tile.location) html += `<p>${tile.location}</p>`;
+        if (tile.coordinates) html += `<p>${tile.coordinates}</p>`;
+        if (tile.artist) html += `<p>${tile.artist}</p>`;
+    } else if (tile.type === 'art') {
+        if (tile.title) html += `<h2>${tile.title}</h2>`;
+        if (tile.artist) html += `<p>${tile.artist}</p>`;
+        if (tile.date) html += `<p>${tile.date}</p>`;
+    }
+    
+    html += '</div>';
+    
+    content.innerHTML = html;
+    viewer.classList.remove('hidden');
 }
 
 // Drag and Drop Functions
