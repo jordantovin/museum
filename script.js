@@ -92,6 +92,8 @@ const elements = {
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM loaded');
+    console.log('Elements:', elements);
     initializeEventListeners();
     loadTilesFromStorage();
     renderTiles();
@@ -156,14 +158,20 @@ function initializeEventListeners() {
 }
 
 // Toggle Functions
-function toggleTileTypeMenu() {
+function toggleTileTypeMenu(e) {
+    e.stopPropagation();
+    console.log('Toggle tile type menu', elements.tileTypeMenu);
     elements.tileTypeMenu.classList.toggle('hidden');
     elements.filterMenu.classList.add('hidden');
+    console.log('Menu hidden class:', elements.tileTypeMenu.classList.contains('hidden'));
 }
 
-function toggleFilterMenu() {
+function toggleFilterMenu(e) {
+    e.stopPropagation();
+    console.log('Toggle filter menu', elements.filterMenu);
     elements.filterMenu.classList.toggle('hidden');
     elements.tileTypeMenu.classList.add('hidden');
+    console.log('Menu hidden class:', elements.filterMenu.classList.contains('hidden'));
 }
 
 function toggleEditMode() {
