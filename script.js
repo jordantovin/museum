@@ -4,7 +4,7 @@
 // Configuration
 const CONFIG = {
     csvUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTKj5a8JIDfxvaw-5pPEb5nHfu_a-jZS9lFgrHqvv6JjzCTbpmMTyxVxqF5yrZPjkH961zi-u_HvQwz/pub?output=csv',
-    webAppUrl: 'https://script.google.com/macros/s/AKfycbz6eCNVIg_AI5YsaSxukfRQXz-1oXcZuwm3xqEVceLQhaAMlX4UDRhmnI7j18Bq2cw/exec', // Replace with your deployed Web App URL from Google Apps Script
+    webAppUrl: 'YOUR_WEB_APP_URL_HERE', // Replace with your deployed Web App URL from Google Apps Script
     sheetNames: {
         object: 'Object',
         sticker: 'Sticker',
@@ -105,7 +105,7 @@ function initApp() {
             e.stopPropagation();
             const rect = addBtn.getBoundingClientRect();
             tileTypeMenu.style.top = (rect.bottom + 8) + 'px';
-            tileTypeMenu.style.right = (window.innerWidth - rect.right) + 'px';
+            tileTypeMenu.style.right = '24px';
             tileTypeMenu.classList.toggle('hidden');
             filterMenu.classList.add('hidden');
         });
@@ -117,7 +117,7 @@ function initApp() {
             e.stopPropagation();
             const rect = filterBtn.getBoundingClientRect();
             filterMenu.style.top = (rect.bottom + 8) + 'px';
-            filterMenu.style.right = (window.innerWidth - rect.right) + 'px';
+            filterMenu.style.right = '24px';
             filterMenu.classList.toggle('hidden');
             tileTypeMenu.classList.add('hidden');
         });
@@ -182,7 +182,17 @@ function initApp() {
     });
     
     // Form submission
-    tileForm.addEventListener('submit', handleFormSubmit);
+    tileForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        // Check if form is valid
+        if (!tileForm.checkValidity()) {
+            tileForm.reportValidity();
+            return;
+        }
+        
+        await handleFormSubmit(e);
+    });
     
     // Close menus when clicking outside
     document.addEventListener('click', function(e) {
