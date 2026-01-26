@@ -615,6 +615,53 @@ input, textarea, button, select {
     display: none !important;
 }
 
+.fullscreen-horizontal {
+    display: flex;
+    width: 90%;
+    height: 90%;
+    gap: 40px;
+    align-items: center;
+}
+
+.fullscreen-image-container {
+    flex: 1;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.fullscreen-image-horizontal {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.fullscreen-info-container {
+    flex: 1;
+    height: 100%;
+    overflow-y: auto;
+    color: white;
+    font-family: Helvetica, 'Helvetica Neue', Arial, sans-serif;
+    padding: 20px;
+}
+
+.fullscreen-info-container h2 {
+    font-size: 36px;
+    font-weight: 500;
+    margin-bottom: 24px;
+}
+
+.fullscreen-info-container p {
+    font-size: 18px;
+    margin: 16px 0;
+    line-height: 1.6;
+}
+
+.fullscreen-info-container strong {
+    font-weight: 600;
+}
+
 .fullscreen-content {
     max-width: 90%;
     max-height: 90%;
@@ -634,7 +681,7 @@ input, textarea, button, select {
     color: white;
     text-align: center;
     margin-top: 24px;
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: Helvetica, 'Helvetica Neue', Arial, sans-serif;
 }
 
 .fullscreen-info h2 {
@@ -665,9 +712,42 @@ input, textarea, button, select {
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
+    z-index: 10;
 }
 
 .fullscreen-close:hover {
     background: white;
     color: black;
+}
+
+/* Context Menu */
+.context-menu {
+    position: absolute;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 10000;
+    min-width: 150px;
+    padding: 4px 0;
+}
+
+.context-menu-item {
+    padding: 10px 16px;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: Helvetica, 'Helvetica Neue', Arial, sans-serif;
+    transition: background 0.2s ease;
+}
+
+.context-menu-item:hover {
+    background: var(--background);
+}
+
+.context-menu-item-danger {
+    color: #d32f2f;
+}
+
+.context-menu-item-danger:hover {
+    background: #ffebee;
 }
