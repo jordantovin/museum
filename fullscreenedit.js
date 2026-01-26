@@ -83,58 +83,6 @@ function addTileInteractions(div, tile, hasImage) {
             }
         });
     }
-
-    // Right-click context menu (only for logged in users)
-    div.addEventListener('contextmenu', function(e) {
-        console.log('Right click detected');
-        // Check if admin module is loaded and user is logged in
-        if (window.MUSEUM_ADMIN && window.MUSEUM_ADMIN.isLoggedIn && window.MUSEUM_ADMIN.isLoggedIn()) {
-            console.log('Admin logged in, showing context menu');
-            e.preventDefault();
-            e.stopPropagation();
-            showContextMenu(e, tile);
-        } else {
-            console.log('Admin not logged in, context menu disabled');
-        }
-    });
-}
-
-// Context Menu
-function showContextMenu(e, tile) {
-    hideContextMenu(); // Hide any existing menu
-    
-    const menu = document.createElement('div');
-    menu.id = 'tileContextMenu';
-    menu.className = 'context-menu';
-    menu.style.left = e.pageX + 'px';
-    menu.style.top = e.pageY + 'px';
-    
-    menu.innerHTML = `
-        <div class="context-menu-item" data-action="edit">Edit</div>
-        <div class="context-menu-item context-menu-item-danger" data-action="delete">Delete</div>
-    `;
-    
-    document.body.appendChild(menu);
-    
-    // Add click handlers
-    menu.querySelector('[data-action="edit"]').addEventListener('click', function(e) {
-        e.stopPropagation();
-        hideContextMenu();
-        editTile(tile);
-    });
-    
-    menu.querySelector('[data-action="delete"]').addEventListener('click', function(e) {
-        e.stopPropagation();
-        hideContextMenu();
-        deleteTile(tile);
-    });
-}
-
-function hideContextMenu() {
-    const existing = document.getElementById('tileContextMenu');
-    if (existing) {
-        existing.remove();
-    }
 }
 
 // Fullscreen Viewer Function - Horizontal Layout
@@ -217,23 +165,9 @@ function editTile(tile) {
     modal.classList.remove('hidden');
 }
 
-// Delete Tile Function
-function deleteTile(tile) {
-    if (confirm(`Are you sure you want to delete this ${tile.type}?`)) {
-        const index = STATE.tiles.findIndex(t => t.id === tile.id);
-        if (index > -1) {
-            STATE.tiles.splice(index, 1);
-            saveTilesToStorage();
-            renderTiles();
-            console.log('Tile deleted:', tile.id);
-        }
-    }
-}
-
 // Export functions for use in master script
 window.MUSEUM_FULLSCREEN = {
     showFullscreen,
     editTile,
-    deleteTile,
     addTileInteractions
 };
