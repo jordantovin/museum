@@ -163,7 +163,7 @@ function deleteTileFromRightClick(tile) {
     }
 }
 
-// Delete from Google Sheets (optional - requires Apps Script endpoint)
+// Delete from Google Sheets
 async function deleteTileFromSheets(tileId) {
     if (!CONFIG.webAppUrl || CONFIG.webAppUrl === 'YOUR_WEB_APP_URL_HERE') {
         console.warn('Web App URL not configured. Tile only deleted from localStorage.');
@@ -171,13 +171,22 @@ async function deleteTileFromSheets(tileId) {
     }
     
     try {
-        // Note: You would need to add a DELETE handler to your Google Apps Script
-        // This is just a placeholder for future implementation
-        const response = await fetch(CONFIG.webAppUrl + '?action=delete&id=' + tileId, {
+        const deleteUrl = CONFIG.webAppUrl + '?action=delete&id=' + encodeURIComponent(tileId);
+        console.log('Deleting from Google Sheets:', deleteUrl);
+        
+        const response = await fetch(deleteUrl, {
             method: 'GET',
-            mode: 'no-cors'
+            mode: 'cors'
         });
-        console.log('Delete request sent to Google Sheets');
+        
+        const result = await response.json();
+        console.log('Delete response from Google Sheets:', result);
+        
+        if (result.success) {
+            console.log('Tile successfully deleted from Google Sheets');
+        } else {
+            console.warn('Tile deletion failed:', result.message);
+        }
     } catch (error) {
         console.error('Error deleting from Google Sheets:', error);
     }
