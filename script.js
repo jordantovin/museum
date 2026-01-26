@@ -465,7 +465,11 @@ function createTileElement(tile) {
     if ((tile.type === 'object' || tile.type === 'art' || tile.type === 'sticker') && hasImage) {
         div.style.cursor = 'pointer';
         div.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Tile clicked:', tile.type, 'Edit mode:', STATE.editMode);
             if (!STATE.editMode) {
+                console.log('Opening fullscreen for:', tile);
                 showFullscreen(tile);
             }
         });
@@ -474,7 +478,9 @@ function createTileElement(tile) {
     // Add click handler for Name tiles with website links
     if (tile.type === 'name' && tile.website) {
         div.style.cursor = 'pointer';
-        div.addEventListener('click', function() {
+        div.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
             if (!STATE.editMode) {
                 window.open(tile.website, '_blank');
             }
@@ -484,7 +490,9 @@ function createTileElement(tile) {
     // Add click handler for tiles with link field
     if ((tile.type === 'inspiration' || tile.type === 'place' || tile.type === 'post') && tile.link) {
         div.style.cursor = 'pointer';
-        div.addEventListener('click', function() {
+        div.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
             if (!STATE.editMode) {
                 window.open(tile.link, '_blank');
             }
@@ -502,8 +510,17 @@ function createTileElement(tile) {
 
 // Fullscreen Viewer Function
 function showFullscreen(tile) {
+    console.log('showFullscreen called with:', tile);
     const viewer = document.getElementById('fullscreenViewer');
     const content = document.getElementById('fullscreenContent');
+    
+    console.log('Viewer element:', viewer);
+    console.log('Content element:', content);
+    
+    if (!viewer || !content) {
+        console.error('Fullscreen elements not found!');
+        return;
+    }
     
     let html = '';
     
@@ -532,8 +549,10 @@ function showFullscreen(tile) {
     
     html += '</div>';
     
+    console.log('Setting content HTML:', html);
     content.innerHTML = html;
     viewer.classList.remove('hidden');
+    console.log('Fullscreen viewer should now be visible');
 }
 
 // Drag and Drop Functions
