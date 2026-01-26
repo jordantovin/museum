@@ -8,18 +8,18 @@
 :root {
     --primary-color: #0078d4;
     --secondary-color: #005a9e;
-    --background: #f2f2f2;
+    --background: #ffffff;
     --tile-bg: #ffffff;
-    --border-color: #d1d1d1;
+    --border-color: #000000;
     --text-primary: #1a1a1a;
     --text-secondary: #666666;
     --overlay-bg: rgba(0, 0, 0, 0.5);
     --hover-overlay: rgba(0, 0, 0, 0.5);
-    --tile-gap: 8px;
+    --tile-gap: 0px;
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     background-color: var(--background);
     color: var(--text-primary);
     overflow-x: hidden;
@@ -398,7 +398,7 @@ body {
 
 /* Main Grid */
 .museum-main {
-    padding: 24px;
+    padding: 0;
 }
 
 .tile-grid {
@@ -591,4 +591,79 @@ body {
 /* Utility Classes */
 .hidden {
     display: none !important;
+}
+
+/* Fullscreen Viewer */
+.fullscreen-viewer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 99999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.fullscreen-viewer.hidden {
+    display: none !important;
+}
+
+.fullscreen-content {
+    max-width: 90%;
+    max-height: 90%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.fullscreen-image {
+    max-width: 100%;
+    max-height: 80vh;
+    object-fit: contain;
+}
+
+.fullscreen-info {
+    color: white;
+    text-align: center;
+    margin-top: 24px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+.fullscreen-info h2 {
+    font-size: 32px;
+    font-weight: 500;
+    margin-bottom: 12px;
+}
+
+.fullscreen-info p {
+    font-size: 18px;
+    margin: 8px 0;
+    opacity: 0.9;
+}
+
+.fullscreen-close {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    background: transparent;
+    border: 2px solid white;
+    color: white;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    font-size: 32px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.fullscreen-close:hover {
+    background: white;
+    color: black;
 }
