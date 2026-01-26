@@ -4,7 +4,7 @@
 // Configuration
 const CONFIG = {
     csvUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTKj5a8JIDfxvaw-5pPEb5nHfu_a-jZS9lFgrHqvv6JjzCTbpmMTyxVxqF5yrZPjkH961zi-u_HvQwz/pub?output=csv',
-    webAppUrl: 'https://script.google.com/macros/s/AKfycbwWunN7dhoswN3Q67kmhOFdT6Kj7UJtC6ACwT5CPpmp87DxR02ywssI8r6aJn7qFg4/exec',
+    webAppUrl: 'https://script.google.com/macros/s/AKfycbz6eCNVIg_AI5YsaSxukfRQXz-1oXcZuwm3xqEVceLQhaAMlX4UDRhmnI7j18Bq2cw/exec',
     sheetNames: {
         object: 'Object',
         sticker: 'Sticker',
@@ -352,22 +352,35 @@ async function loadTilesFromSheets() {
         const response = await fetch(CONFIG.csvUrl);
         const csvText = await response.text();
         const tiles = parseCSV(csvText);
-        STATE.tiles = tiles;
+        
+        // Filter out any invalid tiles
+        const validTiles = tiles.filter(tile => tile.id && tile.type);
+        
+        STATE.tiles = validTiles;
         saveTilesToStorage();
         renderTiles();
-        console.log('Loaded', tiles.length, 'tiles from Google Sheets');
+        console.log('Loaded', validTiles.length, 'tiles from Google Sheets');
     } catch (error) {
         console.error('Error loading from Google Sheets:', error);
+        // If loading from Sheets fails, try localStorage
+        loadTilesFromStorage();
+        if (STATE.tiles.length > 0) {
+            renderTiles();
+        }
     }
 }
 
 // Parse CSV data into tile objects
 function parseCSV(csvText) {
-    const lines = csvText.split('\n');
+    const lines = csvText.trim().split('\n');
     if (lines.length < 2) return [];
     
     // Get headers from first row
-    const headers = lines[0].split(',').map(h => h.trim());
+    const headerLine = lines[0];
+    const headers = parseCSVLine(headerLine);
+    
+    console.log('CSV Headers:', headers);
+    
     const tiles = [];
     
     // Process each data row
@@ -379,18 +392,23 @@ function parseCSV(csvText) {
         if (values.length === 0) continue;
         
         const tile = {};
+        
+        // Map each column to its header
         headers.forEach((header, index) => {
-            if (values[index] && values[index].trim() !== '') {
-                tile[header] = values[index].trim();
+            const value = values[index];
+            if (value && value.trim() !== '') {
+                tile[header.toLowerCase()] = value.trim();
             }
         });
         
-        // Only add if tile has required fields
+        // Only add if tile has required fields (id and type)
         if (tile.id && tile.type) {
             tiles.push(tile);
+            console.log('Parsed tile:', tile);
         }
     }
     
+    console.log('Total tiles parsed:', tiles.length);
     return tiles;
 }
 
