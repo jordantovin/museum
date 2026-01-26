@@ -53,9 +53,8 @@ function addTileInteractions(div, tile, hasImage) {
         div.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            if (!STATE.editMode && window.MUSEUM_ADMIN && window.MUSEUM_ADMIN.isLoggedIn()) {
-                showFullscreen(tile);
-            } else if (!STATE.editMode) {
+            console.log('Tile clicked, showing fullscreen');
+            if (!STATE.editMode) {
                 showFullscreen(tile);
             }
         });
@@ -87,10 +86,15 @@ function addTileInteractions(div, tile, hasImage) {
 
     // Right-click context menu (only for logged in users)
     div.addEventListener('contextmenu', function(e) {
-        if (window.MUSEUM_ADMIN && window.MUSEUM_ADMIN.isLoggedIn()) {
+        console.log('Right click detected');
+        // Check if admin module is loaded and user is logged in
+        if (window.MUSEUM_ADMIN && window.MUSEUM_ADMIN.isLoggedIn && window.MUSEUM_ADMIN.isLoggedIn()) {
+            console.log('Admin logged in, showing context menu');
             e.preventDefault();
             e.stopPropagation();
             showContextMenu(e, tile);
+        } else {
+            console.log('Admin not logged in, context menu disabled');
         }
     });
 }
