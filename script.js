@@ -527,6 +527,11 @@ function createTileElement(tile) {
     if (window.MUSEUM_FULLSCREEN && window.MUSEUM_FULLSCREEN.addTileInteractions) {
         window.MUSEUM_FULLSCREEN.addTileInteractions(div, tile, hasImage);
     }
+    
+    // Add right-click handler (from rightclick.js)
+    if (window.MUSEUM_RIGHTCLICK && window.MUSEUM_RIGHTCLICK.addRightClickHandler) {
+        window.MUSEUM_RIGHTCLICK.addRightClickHandler(div, tile);
+    }
 
     // Add drag event listeners
     div.addEventListener('dragstart', handleDragStart);
