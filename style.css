@@ -103,6 +103,7 @@ input, textarea, button, select {
     padding: 8px;
     z-index: 200;
     min-width: 200px;
+    margin-top: 4px;
 }
 
 .tile-type-menu.hidden,
