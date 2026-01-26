@@ -1,6 +1,6 @@
 // Configuration
 const CONFIG = {
-    nasUrl: 'https://jordantovinrhome.us2.quickconnect.to/Satchel/Museum',
+    nasUrl: 'http://media.jordantovin.com/Satchel/Museum',
     uploadEndpoint: '/upload.php',
     dataEndpoint: '/data/museum_data.json',
     uploadsPath: '/uploads/'
