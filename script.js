@@ -464,8 +464,10 @@ function createTileElement(tile) {
     // Add click handler for fullscreen (object, art, sticker types only)
     if ((tile.type === 'object' || tile.type === 'art' || tile.type === 'sticker') && hasImage) {
         div.style.cursor = 'pointer';
-        div.addEventListener('click', function() {
-            showFullscreen(tile);
+        div.addEventListener('click', function(e) {
+            if (!STATE.editMode) {
+                showFullscreen(tile);
+            }
         });
     }
 
@@ -473,7 +475,9 @@ function createTileElement(tile) {
     if (tile.type === 'name' && tile.website) {
         div.style.cursor = 'pointer';
         div.addEventListener('click', function() {
-            window.open(tile.website, '_blank');
+            if (!STATE.editMode) {
+                window.open(tile.website, '_blank');
+            }
         });
     }
 
@@ -481,7 +485,9 @@ function createTileElement(tile) {
     if ((tile.type === 'inspiration' || tile.type === 'place' || tile.type === 'post') && tile.link) {
         div.style.cursor = 'pointer';
         div.addEventListener('click', function() {
-            window.open(tile.link, '_blank');
+            if (!STATE.editMode) {
+                window.open(tile.link, '_blank');
+            }
         });
     }
 
@@ -492,17 +498,6 @@ function createTileElement(tile) {
     div.addEventListener('drop', handleDrop);
 
     return div;
-}
-
-function getTileMetadata(tile) {
-    const parts = [];
-    
-    if (tile.artist) parts.push(tile.artist);
-    if (tile.location) parts.push(tile.location);
-    if (tile.date) parts.push(tile.date);
-    if (tile.type) parts.push(tile.type);
-
-    return parts.join(' • ');
 }
 
 // Fullscreen Viewer Function
@@ -613,5 +608,6 @@ window.MUSEUM = {
     renderTiles,
     loadTilesFromSheets,
     saveTilesToStorage,
-    loadTilesFromStorage
+    loadTilesFromStorage,
+    showFullscreen
 };
