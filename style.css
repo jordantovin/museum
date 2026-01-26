@@ -91,7 +91,7 @@ body {
 /* Dropdown Menus */
 .tile-type-menu,
 .filter-menu {
-    position: absolute;
+    position: fixed;
     top: 72px;
     right: 24px;
     background: white;
