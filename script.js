@@ -2,8 +2,8 @@
 const CONFIG = {
     nasUrl: 'http://media.jordantovin.com/Satchel/Museum',
     uploadEndpoint: '/upload.php',
-    dataEndpoint: '/data/museum_data.json',
-    uploadsPath: '/uploads/'
+dataEndpoint: '/data/museum_data.json',
+uploadsPath: '/uploads/'
 };
 
 // State
