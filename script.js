@@ -1,8 +1,10 @@
-// Museum Tile System - Main JavaScript
+// Museum Tile System - Master Script
+// Core functionality for tile management, forms, and rendering
 
 // Configuration
 const CONFIG = {
-    sheetsUrl: 'YOUR_GOOGLE_SHEETS_URL_HERE', // Replace with your Google Sheets URL
+    csvUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTKj5a8JIDfxvaw-5pPEb5nHfu_a-jZS9lFgrHqvv6JjzCTbpmMTyxVxqF5yrZPjkH961zi-u_HvQwz/pub?output=csv',
+    webAppUrl: 'https://script.google.com/macros/s/AKfycbz6eCNVIg_AI5YsaSxukfRQXz-1oXcZuwm3xqEVceLQhaAMlX4UDRhmnI7j18Bq2cw/exec', // Replace with your deployed Web App URL from Google Apps Script
     sheetNames: {
         object: 'Object',
         sticker: 'Sticker',
@@ -22,7 +24,8 @@ const STATE = {
     editMode: false,
     selectedTileType: null,
     selectedSize: '1x1',
-    draggedTile: null
+    draggedTile: null,
+    editingTileId: null
 };
 
 // Form field definitions for each tile type
@@ -96,25 +99,13 @@ function initApp() {
     const tileGrid = document.getElementById('tileGrid');
     const toggleBorders = document.getElementById('toggleBorders');
     
-    console.log('Elements found:', {
-        addBtn: !!addBtn,
-        editBtn: !!editBtn,
-        filterBtn: !!filterBtn,
-        tileTypeMenu: !!tileTypeMenu,
-        filterMenu: !!filterMenu
-    });
-    
     // Add button - toggle tile type menu
     if (addBtn) {
         addBtn.addEventListener('click', function(e) {
             e.stopPropagation();
-            console.log('Add button clicked');
-            
-            // Position the menu
             const rect = addBtn.getBoundingClientRect();
             tileTypeMenu.style.top = (rect.bottom + 8) + 'px';
             tileTypeMenu.style.right = (window.innerWidth - rect.right) + 'px';
-            
             tileTypeMenu.classList.toggle('hidden');
             filterMenu.classList.add('hidden');
         });
@@ -124,13 +115,9 @@ function initApp() {
     if (filterBtn) {
         filterBtn.addEventListener('click', function(e) {
             e.stopPropagation();
-            console.log('Filter button clicked');
-            
-            // Position the menu
             const rect = filterBtn.getBoundingClientRect();
             filterMenu.style.top = (rect.bottom + 8) + 'px';
             filterMenu.style.right = (window.innerWidth - rect.right) + 'px';
-            
             filterMenu.classList.toggle('hidden');
             tileTypeMenu.classList.add('hidden');
         });
@@ -141,7 +128,6 @@ function initApp() {
         editBtn.addEventListener('click', function() {
             STATE.editMode = !STATE.editMode;
             editBtn.classList.toggle('active');
-            
             const tiles = tileGrid.querySelectorAll('.tile');
             tiles.forEach(tile => {
                 if (STATE.editMode) {
@@ -208,34 +194,18 @@ function initApp() {
         }
     });
     
-    // Fullscreen viewer close
-    const fullscreenViewer = document.getElementById('fullscreenViewer');
-    const fullscreenClose = document.querySelector('.fullscreen-close');
-    
-    if (fullscreenClose) {
-        fullscreenClose.addEventListener('click', function() {
-            fullscreenViewer.classList.add('hidden');
-        });
-    }
-    
-    if (fullscreenViewer) {
-        fullscreenViewer.addEventListener('click', function(e) {
-            if (e.target === fullscreenViewer) {
-                fullscreenViewer.classList.add('hidden');
-            }
-        });
-    }
-    
-    // ESC key to close fullscreen
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            fullscreenViewer.classList.add('hidden');
-        }
-    });
-    
     // Load and render initial tiles
     loadTilesFromStorage();
-    renderTiles();
+    
+    // Also try to load from Google Sheets
+    loadTilesFromSheets();
+    
+    // If localStorage is empty, wait for Sheets to load
+    if (STATE.tiles.length === 0) {
+        console.log('Waiting for Google Sheets data...');
+    } else {
+        renderTiles();
+    }
     
     console.log('Museum initialized successfully');
 }
@@ -258,6 +228,7 @@ function closeModal() {
     form.reset();
     STATE.selectedTileType = null;
     STATE.selectedSize = '1x1';
+    STATE.editingTileId = null;
 }
 
 function generateFormFields() {
@@ -302,9 +273,7 @@ async function handleFormSubmit(e) {
     const formData = new FormData(e.target);
     const tileData = {
         type: STATE.selectedTileType,
-        size: STATE.selectedSize,
-        createdAt: new Date().toISOString(),
-        id: generateId()
+        size: STATE.selectedSize
     };
 
     // Collect form data
@@ -312,8 +281,21 @@ async function handleFormSubmit(e) {
         tileData[key] = value;
     });
 
-    // Add to state
-    STATE.tiles.push(tileData);
+    if (STATE.editingTileId) {
+        // Update existing tile
+        const tileIndex = STATE.tiles.findIndex(t => t.id === STATE.editingTileId);
+        if (tileIndex !== -1) {
+            tileData.id = STATE.editingTileId;
+            tileData.createdAt = STATE.tiles[tileIndex].createdAt;
+            tileData.updatedAt = new Date().toISOString();
+            STATE.tiles[tileIndex] = tileData;
+        }
+    } else {
+        // Create new tile
+        tileData.createdAt = new Date().toISOString();
+        tileData.id = generateId();
+        STATE.tiles.push(tileData);
+    }
 
     // Save to localStorage
     saveTilesToStorage();
@@ -328,8 +310,14 @@ async function handleFormSubmit(e) {
 
 // Google Sheets Integration
 async function saveTileToSheets(tileData) {
+    if (!CONFIG.webAppUrl || CONFIG.webAppUrl === 'YOUR_WEB_APP_URL_HERE') {
+        console.warn('Web App URL not configured. Data saved to localStorage only.');
+        console.log('To save to Google Sheets, deploy the Google Apps Script and update CONFIG.webAppUrl');
+        return;
+    }
+    
     try {
-        const response = await fetch(CONFIG.sheetsUrl, {
+        const response = await fetch(CONFIG.webAppUrl, {
             method: 'POST',
             mode: 'no-cors',
             headers: {
@@ -337,7 +325,6 @@ async function saveTileToSheets(tileData) {
             },
             body: JSON.stringify(tileData)
         });
-        
         console.log('Tile saved to Google Sheets');
     } catch (error) {
         console.error('Error saving to Google Sheets:', error);
@@ -346,13 +333,72 @@ async function saveTileToSheets(tileData) {
 
 async function loadTilesFromSheets() {
     try {
-        const response = await fetch(CONFIG.sheetsUrl);
-        const data = await response.json();
-        STATE.tiles = data;
+        const response = await fetch(CONFIG.csvUrl);
+        const csvText = await response.text();
+        const tiles = parseCSV(csvText);
+        STATE.tiles = tiles;
+        saveTilesToStorage();
         renderTiles();
+        console.log('Loaded', tiles.length, 'tiles from Google Sheets');
     } catch (error) {
         console.error('Error loading from Google Sheets:', error);
     }
+}
+
+// Parse CSV data into tile objects
+function parseCSV(csvText) {
+    const lines = csvText.split('\n');
+    if (lines.length < 2) return [];
+    
+    // Get headers from first row
+    const headers = lines[0].split(',').map(h => h.trim());
+    const tiles = [];
+    
+    // Process each data row
+    for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+        
+        const values = parseCSVLine(line);
+        if (values.length === 0) continue;
+        
+        const tile = {};
+        headers.forEach((header, index) => {
+            if (values[index] && values[index].trim() !== '') {
+                tile[header] = values[index].trim();
+            }
+        });
+        
+        // Only add if tile has required fields
+        if (tile.id && tile.type) {
+            tiles.push(tile);
+        }
+    }
+    
+    return tiles;
+}
+
+// Parse a CSV line handling quoted values
+function parseCSVLine(line) {
+    const values = [];
+    let current = '';
+    let inQuotes = false;
+    
+    for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        
+        if (char === '"') {
+            inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+            values.push(current);
+            current = '';
+        } else {
+            current += char;
+        }
+    }
+    
+    values.push(current);
+    return values;
 }
 
 // Local Storage Functions
@@ -461,42 +507,9 @@ function createTileElement(tile) {
         `;
     }
 
-    // Add click handler for fullscreen (object, art, sticker types only)
-    if ((tile.type === 'object' || tile.type === 'art' || tile.type === 'sticker') && hasImage) {
-        div.style.cursor = 'pointer';
-        div.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('Tile clicked:', tile.type, 'Edit mode:', STATE.editMode);
-            if (!STATE.editMode) {
-                console.log('Opening fullscreen for:', tile);
-                showFullscreen(tile);
-            }
-        });
-    }
-
-    // Add click handler for Name tiles with website links
-    if (tile.type === 'name' && tile.website) {
-        div.style.cursor = 'pointer';
-        div.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            if (!STATE.editMode) {
-                window.open(tile.website, '_blank');
-            }
-        });
-    }
-
-    // Add click handler for tiles with link field
-    if ((tile.type === 'inspiration' || tile.type === 'place' || tile.type === 'post') && tile.link) {
-        div.style.cursor = 'pointer';
-        div.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            if (!STATE.editMode) {
-                window.open(tile.link, '_blank');
-            }
-        });
+    // Add click and right-click interactions (from fullscreen-editing.js)
+    if (window.MUSEUM_FULLSCREEN && window.MUSEUM_FULLSCREEN.addTileInteractions) {
+        window.MUSEUM_FULLSCREEN.addTileInteractions(div, tile, hasImage);
     }
 
     // Add drag event listeners
@@ -506,53 +519,6 @@ function createTileElement(tile) {
     div.addEventListener('drop', handleDrop);
 
     return div;
-}
-
-// Fullscreen Viewer Function
-function showFullscreen(tile) {
-    console.log('showFullscreen called with:', tile);
-    const viewer = document.getElementById('fullscreenViewer');
-    const content = document.getElementById('fullscreenContent');
-    
-    console.log('Viewer element:', viewer);
-    console.log('Content element:', content);
-    
-    if (!viewer || !content) {
-        console.error('Fullscreen elements not found!');
-        return;
-    }
-    
-    let html = '';
-    
-    if (tile.upload) {
-        html += `<img src="${tile.upload}" alt="${tile.title || ''}" class="fullscreen-image">`;
-    }
-    
-    html += '<div class="fullscreen-info">';
-    
-    if (tile.type === 'object') {
-        if (tile.title) html += `<h2>${tile.title}</h2>`;
-        if (tile.date) html += `<p>${tile.date}</p>`;
-        if (tile.location) html += `<p>${tile.location}</p>`;
-        if (tile.coordinates) html += `<p>${tile.coordinates}</p>`;
-    } else if (tile.type === 'sticker') {
-        if (tile.date) html += `<p>${tile.date}</p>`;
-        if (tile.media) html += `<p>${tile.media}</p>`;
-        if (tile.location) html += `<p>${tile.location}</p>`;
-        if (tile.coordinates) html += `<p>${tile.coordinates}</p>`;
-        if (tile.artist) html += `<p>${tile.artist}</p>`;
-    } else if (tile.type === 'art') {
-        if (tile.title) html += `<h2>${tile.title}</h2>`;
-        if (tile.artist) html += `<p>${tile.artist}</p>`;
-        if (tile.date) html += `<p>${tile.date}</p>`;
-    }
-    
-    html += '</div>';
-    
-    console.log('Setting content HTML:', html);
-    content.innerHTML = html;
-    viewer.classList.remove('hidden');
-    console.log('Fullscreen viewer should now be visible');
 }
 
 // Drag and Drop Functions
@@ -627,6 +593,5 @@ window.MUSEUM = {
     renderTiles,
     loadTilesFromSheets,
     saveTilesToStorage,
-    loadTilesFromStorage,
-    showFullscreen
+    loadTilesFromStorage
 };
