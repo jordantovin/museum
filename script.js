@@ -4,7 +4,7 @@
 // Configuration
 const CONFIG = {
     csvUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTKj5a8JIDfxvaw-5pPEb5nHfu_a-jZS9lFgrHqvv6JjzCTbpmMTyxVxqF5yrZPjkH961zi-u_HvQwz/pub?output=csv',
-    webAppUrl: 'https://script.google.com/macros/s/AKfycbzXRR5wllkh6WJyc9PyqdesDmHrxQp48aGbBlH8dCanePzlKBmG05oFYsVfdyWsiFs/exec',
+    webAppUrl: 'https://script.google.com/macros/s/AKfycby1scDWjZjom1ZTkyNG_2IKxr7akkPwSo6IK4E2yt9YCeSb_bJPlnLLyvEd4whU5ko/exec',
     sheetNames: {
         object: 'Object',
         sticker: 'Sticker',
