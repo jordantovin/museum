@@ -4,7 +4,7 @@
 // Configuration
 const CONFIG = {
     csvUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTKj5a8JIDfxvaw-5pPEb5nHfu_a-jZS9lFgrHqvv6JjzCTbpmMTyxVxqF5yrZPjkH961zi-u_HvQwz/pub?output=csv',
-    webAppUrl: 'https://script.google.com/macros/s/AKfycbxSijAoZszL2F18cJnGcY1KvITqm9dvB1rHpvYXQnoVUFkVkKLIBsR3IUdVqEdvj-4/exec',
+    webAppUrl: 'https://script.google.com/macros/s/AKfycbwWunN7dhoswN3Q67kmhOFdT6Kj7UJtC6ACwT5CPpmp87DxR02ywssI8r6aJn7qFg4/exec',
     sheetNames: {
         object: 'Object',
         sticker: 'Sticker',
@@ -12,7 +12,8 @@ const CONFIG = {
         art: 'Art',
         inspiration: 'Inspiration',
         place: 'Place',
-        post: 'Post'
+        post: 'Post',
+        article: 'Article'
     }
 };
 
@@ -35,7 +36,8 @@ const FORM_FIELDS = {
         { name: 'title', label: 'Title', type: 'text', required: true },
         { name: 'date', label: 'Date', type: 'date', required: false },
         { name: 'location', label: 'Location', type: 'text', required: false },
-        { name: 'coordinates', label: 'Coordinates', type: 'text', required: false }
+        { name: 'coordinates', label: 'Coordinates', type: 'text', required: false },
+        { name: 'content', label: 'About', type: 'textarea', required: false }
     ],
     sticker: [
         { name: 'upload', label: 'Upload URL', type: 'url', required: true },
@@ -43,7 +45,8 @@ const FORM_FIELDS = {
         { name: 'media', label: 'Media', type: 'text', required: false },
         { name: 'location', label: 'Location', type: 'text', required: false },
         { name: 'coordinates', label: 'Coordinates', type: 'text', required: false },
-        { name: 'artist', label: 'Artist', type: 'text', required: false }
+        { name: 'artist', label: 'Artist', type: 'text', required: false },
+        { name: 'content', label: 'About', type: 'textarea', required: false }
     ],
     name: [
         { name: 'website', label: 'Website', type: 'url', required: false },
@@ -57,7 +60,8 @@ const FORM_FIELDS = {
         { name: 'upload', label: 'Upload URL', type: 'url', required: true },
         { name: 'title', label: 'Title', type: 'text', required: true },
         { name: 'artist', label: 'Artist', type: 'text', required: false },
-        { name: 'date', label: 'Date', type: 'date', required: false }
+        { name: 'date', label: 'Date', type: 'date', required: false },
+        { name: 'content', label: 'About', type: 'textarea', required: false }
     ],
     inspiration: [
         { name: 'upload', label: 'Upload URL', type: 'url', required: false },
@@ -75,6 +79,12 @@ const FORM_FIELDS = {
         { name: 'link', label: 'Link', type: 'url', required: false },
         { name: 'title', label: 'Title', type: 'text', required: true },
         { name: 'content', label: 'Content', type: 'textarea', required: false }
+    ],
+    article: [
+        { name: 'upload', label: 'Upload URL', type: 'url', required: false },
+        { name: 'link', label: 'Link', type: 'url', required: false },
+        { name: 'title', label: 'Title', type: 'text', required: true },
+        { name: 'date', label: 'Date', type: 'date', required: false }
     ]
 };
 
