@@ -150,7 +150,6 @@ function showFullscreen(tile, index) {
         // Format date to remove timestamp if present
         let displayDate = tile.date;
         if (displayDate.includes('T')) {
-            // If it's an ISO timestamp, extract just the date part
             displayDate = displayDate.split('T')[0];
         }
         html += `<p class="fullscreen-date">${displayDate}</p>`;
@@ -177,20 +176,20 @@ function showFullscreen(tile, index) {
     
     html += '</div>'; // Close metadata
     
-    // Content box for objects, art, and stickers
+    // Content section (no grey box, just regular text)
     if (tile.type === 'object' || tile.type === 'art' || tile.type === 'sticker') {
         const content = tile.content || '';
         if (content) {
-            html += '<div class="fullscreen-content-box">';
+            html += '<div class="fullscreen-content">';
             html += `<h3>About</h3>`;
-            html += `<p id="fullscreen-content-text">${content}</p>`;
+            html += `<p>${content}</p>`;
             html += '</div>';
         }
     }
     
     // Edit button for admin
     if (window.isLoggedIn && window.isLoggedIn()) {
-        html += `<button onclick="window.MUSEUM_FULLSCREEN.editFromFullscreen('${tile.id}')" style="margin-top: 20px; padding: 10px 20px; background: black; color: white; border: none; border-radius: 4px; cursor: pointer;">Edit</button>`;
+        html += `<button onclick="window.MUSEUM_FULLSCREEN.editInFullscreen('${tile.id}')" style="margin-top: 20px; padding: 10px 20px; background: black; color: white; border: none; border-radius: 4px; cursor: pointer;">Edit</button>`;
     }
     
     html += '</div>'; // Close info container
@@ -200,7 +199,68 @@ function showFullscreen(tile, index) {
     viewer.classList.remove('hidden');
 }
 
-// Edit tile from fullscreen view
+// Edit tile inline in fullscreen view
+function editInFullscreen(tileId) {
+    const tile = STATE.tiles.find(t => t.id === tileId);
+    if (!tile) return;
+    
+    // Make title editable
+    const titleElement = document.querySelector('.fullscreen-info-container h2');
+    const dateElement = document.querySelector('.fullscreen-date');
+    const contentElement = document.querySelector('.fullscreen-content p');
+    
+    if (titleElement) {
+        titleElement.contentEditable = true;
+        titleElement.style.border = '1px solid #ccc';
+        titleElement.style.padding = '5px';
+        titleElement.focus();
+    }
+    
+    if (dateElement) {
+        dateElement.contentEditable = true;
+        dateElement.style.border = '1px solid #ccc';
+        dateElement.style.padding = '5px';
+    }
+    
+    if (contentElement) {
+        contentElement.contentEditable = true;
+        contentElement.style.border = '1px solid #ccc';
+        contentElement.style.padding = '10px';
+    }
+    
+    // Change button to Save
+    const editBtn = document.querySelector('.fullscreen-info-container button');
+    if (editBtn) {
+        editBtn.textContent = 'Save';
+        editBtn.onclick = async function() {
+            // Save the changes
+            if (titleElement) tile.title = titleElement.textContent;
+            if (dateElement) tile.date = dateElement.textContent;
+            if (contentElement) tile.content = contentElement.textContent;
+            
+            tile.updatedAt = new Date().toISOString();
+            
+            // Update in STATE
+            const index = STATE.tiles.findIndex(t => t.id === tileId);
+            if (index !== -1) {
+                STATE.tiles[index] = tile;
+            }
+            
+            // Save to Google Sheets
+            if (typeof saveTileToSheets === 'function') {
+                await saveTileToSheets(tile);
+            }
+            
+            // Re-render and close
+            if (typeof renderTiles === 'function') {
+                renderTiles();
+            }
+            document.getElementById('fullscreenViewer').classList.add('hidden');
+        };
+    }
+}
+
+// Old function - keep for compatibility
 function editFromFullscreen(tileId) {
     const tile = STATE.tiles.find(t => t.id === tileId);
     if (!tile) return;
@@ -218,5 +278,6 @@ function editFromFullscreen(tileId) {
 window.MUSEUM_FULLSCREEN = {
     addTileInteractions,
     showFullscreen,
-    editFromFullscreen
+    editFromFullscreen,
+    editInFullscreen
 };
