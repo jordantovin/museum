@@ -131,7 +131,7 @@ function editTileFromRightClick(tile) {
 }
 
 // Delete tile
-function deleteTileFromRightClick(tile) {
+async function deleteTileFromRightClick(tile) {
     const confirmMessage = `Are you sure you want to delete this ${tile.type}?\n\nTitle: ${tile.title || tile.firstName + ' ' + tile.lastName || 'Untitled'}`;
     
     if (confirm(confirmMessage)) {
@@ -150,7 +150,7 @@ function deleteTileFromRightClick(tile) {
             console.log('Tile deleted successfully from local state');
             
             // Delete from Google Sheets
-            deleteTileFromSheets(tile.id);
+            await deleteTileFromSheets(tile.id);
         } else {
             console.error('Tile not found in STATE');
         }
