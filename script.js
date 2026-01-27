@@ -4,7 +4,7 @@
 // Configuration
 const CONFIG = {
     csvUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTKj5a8JIDfxvaw-5pPEb5nHfu_a-jZS9lFgrHqvv6JjzCTbpmMTyxVxqF5yrZPjkH961zi-u_HvQwz/pub?output=csv',
-    webAppUrl: 'https://script.google.com/macros/s/AKfycbwM6nl5HraFn9uo0BCAGmqIadSC82Ke6_OUa0SzVcix7dpnZDQbGFOB2OLBVWeSjnc/exec',
+    webAppUrl: 'https://script.google.com/macros/s/AKfycbwWunN7dhoswN3Q67kmhOFdT6Kj7UJtC6ACwT5CPpmp87DxR02ywssI8r6aJn7qFg4/exec',
     sheetNames: {
         object: 'Object',
         sticker: 'Sticker',
@@ -207,13 +207,17 @@ function initApp() {
     // Load and render initial tiles
     loadTilesFromStorage();
     
+    // Log what's in localStorage
+    console.log('Tiles in localStorage:', STATE.tiles.length);
+    
     // Also try to load from Google Sheets
     loadTilesFromSheets();
     
     // If localStorage is empty, wait for Sheets to load
     if (STATE.tiles.length === 0) {
-        console.log('Waiting for Google Sheets data...');
+        console.log('No tiles in localStorage, waiting for Google Sheets data...');
     } else {
+        console.log('Rendering', STATE.tiles.length, 'tiles from localStorage');
         renderTiles();
     }
     
@@ -349,9 +353,11 @@ async function saveTileToSheets(tileData) {
 
 async function loadTilesFromSheets() {
     try {
-        const response = await fetch(CONFIG.csvUrl);
-        const csvText = await response.text();
-        const tiles = parseCSV(csvText);
+        console.log('Loading tiles from Web App...');
+        const response = await fetch(CONFIG.webAppUrl);
+        const tiles = await response.json();
+        
+        console.log('Raw response from Web App:', tiles);
         
         // Filter out any invalid tiles
         const validTiles = tiles.filter(tile => tile.id && tile.type);
@@ -359,13 +365,14 @@ async function loadTilesFromSheets() {
         STATE.tiles = validTiles;
         saveTilesToStorage();
         renderTiles();
-        console.log('Loaded', validTiles.length, 'tiles from Google Sheets');
+        console.log('Loaded', validTiles.length, 'tiles from Google Sheets Web App');
     } catch (error) {
         console.error('Error loading from Google Sheets:', error);
         // If loading from Sheets fails, try localStorage
         loadTilesFromStorage();
         if (STATE.tiles.length > 0) {
             renderTiles();
+            console.log('Loaded', STATE.tiles.length, 'tiles from localStorage (fallback)');
         }
     }
 }
@@ -449,12 +456,21 @@ function loadTilesFromStorage() {
 
 // Tile Rendering
 function renderTiles() {
+    console.log('renderTiles called with', STATE.tiles.length, 'tiles');
     const tileGrid = document.getElementById('tileGrid');
+    
+    if (!tileGrid) {
+        console.error('Tile grid element not found!');
+        return;
+    }
+    
     let tilesToRender = [...STATE.tiles];
+    console.log('Tiles before filter:', tilesToRender.length);
 
     // Apply filter
     if (STATE.currentFilter !== 'all') {
         tilesToRender = tilesToRender.filter(tile => tile.type === STATE.currentFilter);
+        console.log('Tiles after filter (' + STATE.currentFilter + '):', tilesToRender.length);
     }
 
     // Apply sort
@@ -470,6 +486,8 @@ function renderTiles() {
         const tileElement = createTileElement(tile);
         tileGrid.appendChild(tileElement);
     });
+    
+    console.log('Rendered', tilesToRender.length, 'tiles to grid');
 
     // Re-apply edit mode if active
     if (STATE.editMode) {
