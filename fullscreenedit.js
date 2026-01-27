@@ -143,12 +143,15 @@ function showFullscreen(tile, index) {
     
     // Info on right
     html += '<div class="fullscreen-info-container">';
-    html += `<h2>${tile.title || 'Untitled'}</h2>`;
     
-    // Use the 'date' column instead of 'createdAt'
+    // Title and date at the very top
+    html += `<h2>${tile.title || 'Untitled'}</h2>`;
     if (tile.date) {
-        html += `<p><strong>Date:</strong> ${tile.date}</p>`;
+        html += `<p class="fullscreen-date">${tile.date}</p>`;
     }
+    
+    // Metadata section
+    html += '<div class="fullscreen-metadata">';
     
     if (tile.artist && tile.artist !== 'Unknown') {
         html += `<p><strong>Artist:</strong> ${tile.artist}</p>`;
@@ -166,15 +169,17 @@ function showFullscreen(tile, index) {
         html += `<p><strong>Coordinates:</strong> ${tile.coordinates}</p>`;
     }
     
+    html += '</div>'; // Close metadata
+    
     // Content box for objects, art, and stickers
     if (tile.type === 'object' || tile.type === 'art' || tile.type === 'sticker') {
         const content = tile.content || '';
-        html += '<div class="fullscreen-content-box' + (content ? '' : ' empty') + '">';
         if (content) {
+            html += '<div class="fullscreen-content-box">';
             html += `<h3>About</h3>`;
             html += `<p id="fullscreen-content-text">${content}</p>`;
+            html += '</div>';
         }
-        html += '</div>';
     }
     
     // Edit button for admin
@@ -182,7 +187,7 @@ function showFullscreen(tile, index) {
         html += `<button onclick="window.MUSEUM_FULLSCREEN.editFromFullscreen('${tile.id}')" style="margin-top: 20px; padding: 10px 20px; background: black; color: white; border: none; border-radius: 4px; cursor: pointer;">Edit</button>`;
     }
     
-    html += '</div>';
+    html += '</div>'; // Close info container
     html += '</div>';
     
     content.innerHTML = html;
