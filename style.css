@@ -37,8 +37,8 @@ input, textarea, button, select {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: red;
-    z-index: 1000;
+    border: 5px solid red;
+    z-index: 10000;
     pointer-events: none;
 }
 
@@ -445,8 +445,11 @@ input, textarea, button, select {
 }
 
 .tile:hover {
-    transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.tile:hover .tile-image {
+    transform: scale(1.05);
 }
 
 .tile.dragging {
@@ -504,6 +507,7 @@ input, textarea, button, select {
     height: 100%;
     object-fit: contain;
     background: white;
+    transition: transform 0.3s ease;
 }
 
 .tile-content {
@@ -695,24 +699,23 @@ input, textarea, button, select {
 
 .fullscreen-content-box {
     margin-top: 30px;
-    padding: 20px;
-    background: #f5f5f5;
-    border-radius: 8px;
-    min-height: 100px;
 }
 
-.fullscreen-content-box h3 {
+.fullscreen-content-box h3,
+.fullscreen-content h3 {
     margin: 0 0 15px 0;
     font-size: 20px;
     font-weight: 600;
     color: black;
 }
 
-.fullscreen-content-box p {
+.fullscreen-content-box p,
+.fullscreen-content p {
     margin: 0;
     white-space: pre-wrap;
     line-height: 1.6;
     color: #333;
+    font-size: 18px;
 }
 
 .fullscreen-content-box.empty {
