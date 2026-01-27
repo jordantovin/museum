@@ -147,7 +147,13 @@ function showFullscreen(tile, index) {
     // Title and date at the very top
     html += `<h2>${tile.title || 'Untitled'}</h2>`;
     if (tile.date) {
-        html += `<p class="fullscreen-date">${tile.date}</p>`;
+        // Format date to remove timestamp if present
+        let displayDate = tile.date;
+        if (displayDate.includes('T')) {
+            // If it's an ISO timestamp, extract just the date part
+            displayDate = displayDate.split('T')[0];
+        }
+        html += `<p class="fullscreen-date">${displayDate}</p>`;
     }
     
     // Metadata section
