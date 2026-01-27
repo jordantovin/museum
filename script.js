@@ -4,7 +4,7 @@
 // Configuration
 const CONFIG = {
     csvUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTKj5a8JIDfxvaw-5pPEb5nHfu_a-jZS9lFgrHqvv6JjzCTbpmMTyxVxqF5yrZPjkH961zi-u_HvQwz/pub?output=csv',
-    webAppUrl: 'https://script.google.com/macros/s/AKfycbwWunN7dhoswN3Q67kmhOFdT6Kj7UJtC6ACwT5CPpmp87DxR02ywssI8r6aJn7qFg4/exec',
+    webAppUrl: 'https://script.google.com/macros/s/AKfycbwN2tN9_Uua8eOS_O-7viPASn5ic6ov1YFMjMSZzH-zuZMGk7loz6hnUxoWSWsRWFQ/exec',
     sheetNames: {
         object: 'Object',
         sticker: 'Sticker',
@@ -355,6 +355,9 @@ async function saveTileToSheets(tileData) {
         return;
     }
     
+    console.log('Saving to Google Sheets:', tileData);
+    console.log('Content field:', tileData.content);
+    
     try {
         const response = await fetch(CONFIG.webAppUrl, {
             method: 'POST',
@@ -364,7 +367,7 @@ async function saveTileToSheets(tileData) {
             },
             body: JSON.stringify(tileData)
         });
-        console.log('Tile saved to Google Sheets');
+        console.log('Tile saved to Google Sheets - check your sheet for content column');
     } catch (error) {
         console.error('Error saving to Google Sheets:', error);
     }
