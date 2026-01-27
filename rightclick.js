@@ -142,20 +142,14 @@ function deleteTileFromRightClick(tile) {
         if (index > -1) {
             STATE.tiles.splice(index, 1);
             
-            // Save to localStorage
-            if (typeof saveTilesToStorage === 'function') {
-                saveTilesToStorage();
-            }
-            
             // Re-render tiles
             if (typeof renderTiles === 'function') {
                 renderTiles();
             }
             
-            console.log('Tile deleted successfully');
+            console.log('Tile deleted successfully from local state');
             
-            // Optionally: Also delete from Google Sheets
-            // You would need to implement a DELETE endpoint in your Google Apps Script
+            // Delete from Google Sheets
             deleteTileFromSheets(tile.id);
         } else {
             console.error('Tile not found in STATE');
