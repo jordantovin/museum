@@ -85,7 +85,7 @@ if (document.readyState === 'loading') {
     initApp();
 }
 
-function initApp() {
+async function initApp() {
     console.log('Initializing Museum...');
     
     // Get DOM elements
@@ -204,22 +204,8 @@ function initApp() {
         }
     });
     
-    // Load and render initial tiles
-    loadTilesFromStorage();
-    
-    // Log what's in localStorage
-    console.log('Tiles in localStorage:', STATE.tiles.length);
-    
-    // Also try to load from Google Sheets
-    loadTilesFromSheets();
-    
-    // If localStorage is empty, wait for Sheets to load
-    if (STATE.tiles.length === 0) {
-        console.log('No tiles in localStorage, waiting for Google Sheets data...');
-    } else {
-        console.log('Rendering', STATE.tiles.length, 'tiles from localStorage');
-        renderTiles();
-    }
+    // Load tiles from Google Sheets on startup (only once)
+    await loadTilesFromSheets();
     
     console.log('Museum initialized successfully');
 }
