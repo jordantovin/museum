@@ -156,7 +156,9 @@ async function initApp() {
     
     // Filter options
     document.querySelectorAll('.filter-option').forEach(btn => {
-        btn.addEventListener('click', function() {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation(); // Prevent menu from closing
+            
             if (this.dataset.sort) {
                 // Handle sort selection
                 STATE.currentSort = this.dataset.sort;
@@ -173,7 +175,7 @@ async function initApp() {
                 this.classList.add('checked');
             }
             renderTiles();
-            // Don't close menu immediately so user can see selection
+            // Menu stays open - don't close
         });
     });
     
@@ -514,6 +516,15 @@ function renderTiles() {
     }
 }
 
+// Helper function to format dates (remove timestamps)
+function formatDate(dateString) {
+    if (!dateString) return '';
+    if (dateString.includes('T')) {
+        return dateString.split('T')[0];
+    }
+    return dateString;
+}
+
 function createTileElement(tile) {
     const div = document.createElement('div');
     div.className = 'tile';
@@ -544,12 +555,12 @@ function createTileElement(tile) {
     if (tile.type === 'object') {
         overlayContent = `
             <div class="tile-overlay-title">${tile.title || ''}</div>
-            <div class="tile-overlay-meta">${tile.date || ''}</div>
+            <div class="tile-overlay-meta">${formatDate(tile.date)}</div>
         `;
     } else if (tile.type === 'sticker') {
         overlayContent = `
             <div class="tile-overlay-title">${tile.location || ''}</div>
-            <div class="tile-overlay-meta">${tile.date || ''}</div>
+            <div class="tile-overlay-meta">${formatDate(tile.date)}</div>
         `;
     } else if (tile.type === 'name') {
         overlayContent = ''; // Just opacity, no text
