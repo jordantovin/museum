@@ -282,8 +282,10 @@ function generateFormFields() {
         });
     });
 
-    // Don't set default size - user must choose
-    STATE.selectedSize = null;
+    // Don't reset size if editing (it's already set from the tile)
+    if (!STATE.editingTileId) {
+        STATE.selectedSize = null;
+    }
 }
 
 // Form Submission
