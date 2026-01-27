@@ -113,9 +113,6 @@ async function initApp() {
     if (addBtn) {
         addBtn.addEventListener('click', function(e) {
             e.stopPropagation();
-            const rect = addBtn.getBoundingClientRect();
-            tileTypeMenu.style.top = (rect.bottom + 16) + 'px';
-            tileTypeMenu.style.right = '16px';
             tileTypeMenu.classList.toggle('hidden');
             filterMenu.classList.add('hidden');
         });
@@ -125,9 +122,6 @@ async function initApp() {
     if (filterBtn) {
         filterBtn.addEventListener('click', function(e) {
             e.stopPropagation();
-            const rect = filterBtn.getBoundingClientRect();
-            filterMenu.style.top = (rect.bottom + 16) + 'px';
-            filterMenu.style.right = '16px';
             filterMenu.classList.toggle('hidden');
             tileTypeMenu.classList.add('hidden');
         });
