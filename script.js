@@ -4,7 +4,7 @@
 // Configuration
 const CONFIG = {
     csvUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTKj5a8JIDfxvaw-5pPEb5nHfu_a-jZS9lFgrHqvv6JjzCTbpmMTyxVxqF5yrZPjkH961zi-u_HvQwz/pub?output=csv',
-    webAppUrl: 'https://script.google.com/macros/s/AKfycbwN2tN9_Uua8eOS_O-7viPASn5ic6ov1YFMjMSZzH-zuZMGk7loz6hnUxoWSWsRWFQ/exec',
+    webAppUrl: 'https://script.google.com/macros/s/AKfycbwWunN7dhoswN3Q67kmhOFdT6Kj7UJtC6ACwT5CPpmp87DxR02ywssI8r6aJn7qFg4/exec',
     sheetNames: {
         object: 'Object',
         sticker: 'Sticker',
@@ -498,9 +498,17 @@ function renderTiles() {
 
     // Apply sort
     if (STATE.currentSort === 'newest') {
-        tilesToRender.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        tilesToRender.sort((a, b) => {
+            const dateA = a.date || a.createdAt || '';
+            const dateB = b.date || b.createdAt || '';
+            return new Date(dateB) - new Date(dateA);
+        });
     } else if (STATE.currentSort === 'oldest') {
-        tilesToRender.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+        tilesToRender.sort((a, b) => {
+            const dateA = a.date || a.createdAt || '';
+            const dateB = b.date || b.createdAt || '';
+            return new Date(dateA) - new Date(dateB);
+        });
     }
 
     // Render
