@@ -62,13 +62,13 @@ function showLoginModal() {
                 <form id="loginForm">
                     <div class="form-group">
                         <label for="adminUsername">Username</label>
-                        <input type="text" id="adminUsername" required autocomplete="username">
+                        <input type="text" id="adminUsername" required autocomplete="username" style="margin-bottom: 16px;">
                     </div>
                     <div class="form-group">
                         <label for="adminPassword">Password</label>
-                        <input type="password" id="adminPassword" required autocomplete="current-password">
+                        <input type="password" id="adminPassword" required autocomplete="current-password" style="margin-bottom: 16px;">
                     </div>
-                    <div id="loginError" style="color: red; margin-bottom: 16px; display: none;">
+                    <div id="loginError" style="color: #d32f2f; margin-bottom: 16px; display: none; padding: 8px; background: #ffebee; border-radius: 4px;">
                         Invalid username or password
                     </div>
                     <div class="form-actions">
