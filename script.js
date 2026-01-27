@@ -4,7 +4,7 @@
 // Configuration
 const CONFIG = {
     csvUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTKj5a8JIDfxvaw-5pPEb5nHfu_a-jZS9lFgrHqvv6JjzCTbpmMTyxVxqF5yrZPjkH961zi-u_HvQwz/pub?output=csv',
-    webAppUrl: 'https://script.google.com/macros/s/AKfycby1scDWjZjom1ZTkyNG_2IKxr7akkPwSo6IK4E2yt9YCeSb_bJPlnLLyvEd4whU5ko/exec',
+    webAppUrl: 'https://script.google.com/macros/s/AKfycbwWunN7dhoswN3Q67kmhOFdT6Kj7UJtC6ACwT5CPpmp87DxR02ywssI8r6aJn7qFg4/exec',
     sheetNames: {
         object: 'Object',
         sticker: 'Sticker',
@@ -501,7 +501,12 @@ function renderTiles() {
         tilesToRender.sort((a, b) => {
             const dateA = a.date || a.createdAt || '';
             const dateB = b.date || b.createdAt || '';
-            return new Date(dateB) - new Date(dateA);
+            const result = new Date(dateB) - new Date(dateA);
+            if (a.title?.includes('McDonald') || b.title?.includes('McDonald') || 
+                a.title?.includes('Hikes') || b.title?.includes('Hikes')) {
+                console.log('Comparing:', a.title, 'date:', dateA, 'vs', b.title, 'date:', dateB, 'result:', result);
+            }
+            return result;
         });
     } else if (STATE.currentSort === 'oldest') {
         tilesToRender.sort((a, b) => {
