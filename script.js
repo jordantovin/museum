@@ -290,6 +290,13 @@ async function handleFormSubmit(e) {
         return;
     }
 
+    // Show loading state
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Saving...';
+    submitBtn.style.opacity = '0.6';
+
     const formData = new FormData(e.target);
     const tileData = {
         type: STATE.selectedTileType,
@@ -319,6 +326,11 @@ async function handleFormSubmit(e) {
 
     // Save to Google Sheets (this is the important part)
     await saveTileToSheets(tileData);
+
+    // Reset button state
+    submitBtn.disabled = false;
+    submitBtn.textContent = originalText;
+    submitBtn.style.opacity = '1';
 
     // Render and close
     renderTiles();
