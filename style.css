@@ -513,9 +513,10 @@ input, textarea, button, select {
     transition: transform 0.3s ease;
 }
 
-/* Article tiles should crop to fill */
+/* Article tiles should crop to fill with no background */
 .tile[data-type="article"] .tile-image {
     object-fit: cover;
+    background: none;
 }
 
 .tile-content {
