@@ -30,22 +30,21 @@ function initAdmin() {
 }
 
 function showLoginButton() {
-    // Add login button to header if not already there
-    if (document.getElementById('loginBtn')) return;
+    const loginBtn = document.getElementById('loginBtn');
+    if (!loginBtn) return;
     
-    const headerRight = document.querySelector('.header-right');
-    if (!headerRight) return;
-    
-    const loginBtn = document.createElement('button');
-    loginBtn.id = 'loginBtn';
-    loginBtn.className = 'header-btn';
+    loginBtn.textContent = 'LOGIN';
     loginBtn.title = 'Admin Login';
-    loginBtn.innerHTML = '🔒';
+    loginBtn.onclick = showLoginModal;
+}
+
+function updateLoginButtonToLogout() {
+    const loginBtn = document.getElementById('loginBtn');
+    if (!loginBtn) return;
     
-    // Insert at the beginning
-    headerRight.insertBefore(loginBtn, headerRight.firstChild);
-    
-    loginBtn.addEventListener('click', showLoginModal);
+    loginBtn.textContent = 'LOGOUT';
+    loginBtn.title = 'Logout';
+    loginBtn.onclick = logout;
 }
 
 function showLoginModal() {
@@ -118,12 +117,8 @@ function handleLogin(e) {
         showAdminControls();
         
         // Replace login button with logout button
-        const loginBtn = document.getElementById('loginBtn');
-        if (loginBtn) {
-            loginBtn.innerHTML = '🔓';
-            loginBtn.title = 'Logout';
-            loginBtn.onclick = logout;
-        }
+        // Update login button
+        updateLoginButtonToLogout();
     } else {
         // Login failed
         errorDiv.style.display = 'block';
@@ -136,14 +131,7 @@ function logout() {
     if (confirm('Are you sure you want to logout?')) {
         sessionStorage.removeItem('museumAdminLoggedIn');
         hideAdminControls();
-        
-        // Replace logout button with login button
-        const loginBtn = document.getElementById('loginBtn');
-        if (loginBtn) {
-            loginBtn.innerHTML = '🔒';
-            loginBtn.title = 'Admin Login';
-            loginBtn.onclick = showLoginModal;
-        }
+        showLoginButton();
         
         // Reload to reset state
         location.reload();
@@ -159,6 +147,9 @@ function showAdminControls() {
     if (addBtn) addBtn.style.display = 'flex';
     if (editBtn) editBtn.style.display = 'flex';
     if (filterBtn) filterBtn.style.display = 'flex';
+    
+    // Update login button to show logout
+    updateLoginButtonToLogout();
 }
 
 function hideAdminControls() {
