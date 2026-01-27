@@ -233,10 +233,15 @@ function editInFullscreen(tileId) {
     if (editBtn) {
         editBtn.textContent = 'Save';
         editBtn.onclick = async function() {
+            // Show saving state
+            editBtn.disabled = true;
+            editBtn.textContent = 'Saving...';
+            editBtn.style.opacity = '0.6';
+            
             // Save the changes
-            if (titleElement) tile.title = titleElement.textContent;
-            if (dateElement) tile.date = dateElement.textContent;
-            if (contentElement) tile.content = contentElement.textContent;
+            if (titleElement) tile.title = titleElement.textContent.trim();
+            if (dateElement) tile.date = dateElement.textContent.trim();
+            if (contentElement) tile.content = contentElement.textContent.trim();
             
             tile.updatedAt = new Date().toISOString();
             
@@ -249,12 +254,22 @@ function editInFullscreen(tileId) {
             // Save to Google Sheets
             if (typeof saveTileToSheets === 'function') {
                 await saveTileToSheets(tile);
+                console.log('Tile saved to Google Sheets:', tile);
+            } else {
+                console.error('saveTileToSheets function not found!');
             }
             
             // Re-render and close
             if (typeof renderTiles === 'function') {
                 renderTiles();
             }
+            
+            // Reset button
+            editBtn.disabled = false;
+            editBtn.textContent = 'Save';
+            editBtn.style.opacity = '1';
+            
+            // Close fullscreen
             document.getElementById('fullscreenViewer').classList.add('hidden');
         };
     }
