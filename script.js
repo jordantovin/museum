@@ -317,15 +317,14 @@ async function handleFormSubmit(e) {
         STATE.tiles.push(tileData);
     }
 
-    // Save to localStorage
-    saveTilesToStorage();
-
-    // Save to Google Sheets
+    // Save to Google Sheets (this is the important part)
     await saveTileToSheets(tileData);
 
     // Render and close
     renderTiles();
     closeModal();
+    
+    console.log('Tile saved:', tileData);
 }
 
 // Google Sheets Integration
