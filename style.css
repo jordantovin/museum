@@ -37,7 +37,7 @@ input, textarea, button, select {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: white;
+    background: red;
     z-index: 1000;
     pointer-events: none;
 }
@@ -811,7 +811,9 @@ input, textarea, button, select {
 
 /* Dropdown Menus */
 .dropdown-menu {
-    position: absolute;
+    position: fixed;
+    top: 70px;
+    right: 16px;
     background: white;
     border: 1px solid #ddd;
     border-radius: 8px;
