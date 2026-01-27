@@ -32,14 +32,7 @@ input, textarea, button, select {
 
 /* Red Debug Box */
 .debug-box {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    border: 5px solid red;
-    z-index: 10000;
-    pointer-events: none;
+    display: none;
 }
 
 /* Header */
@@ -98,6 +91,16 @@ input, textarea, button, select {
     background: var(--primary-color);
     color: white;
     border-color: var(--primary-color);
+}
+
+#loginBtn {
+    width: auto;
+    min-width: 85px;
+    padding: 0 12px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: Helvetica, 'Helvetica Neue', Arial, sans-serif;
+    letter-spacing: 0.5px;
 }
 
 .add-btn:hover {
@@ -670,8 +673,9 @@ input, textarea, button, select {
 .fullscreen-info-container h2 {
     font-size: 36px;
     font-weight: 500;
-    margin-bottom: 8px;
+    margin: 0 0 8px 0;
     color: black;
+    padding: 0;
 }
 
 .fullscreen-date {
@@ -679,10 +683,12 @@ input, textarea, button, select {
     color: #666;
     margin: 0 0 24px 0 !important;
     font-weight: 400;
+    padding: 0;
 }
 
 .fullscreen-metadata {
-    margin-bottom: 20px;
+    margin: 0 0 20px 0;
+    padding: 0;
 }
 
 .fullscreen-info-container p {
@@ -690,6 +696,7 @@ input, textarea, button, select {
     margin: 16px 0;
     line-height: 1.6;
     color: #333;
+    padding: 0;
 }
 
 .fullscreen-info-container strong {
@@ -697,8 +704,10 @@ input, textarea, button, select {
     color: black;
 }
 
+.fullscreen-content,
 .fullscreen-content-box {
-    margin-top: 30px;
+    margin: 30px 0 0 0;
+    padding: 0;
 }
 
 .fullscreen-content-box h3,
@@ -707,11 +716,13 @@ input, textarea, button, select {
     font-size: 20px;
     font-weight: 600;
     color: black;
+    padding: 0;
 }
 
 .fullscreen-content-box p,
 .fullscreen-content p {
     margin: 0;
+    padding: 0;
     white-space: pre-wrap;
     line-height: 1.6;
     color: #333;
