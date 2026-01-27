@@ -363,7 +363,8 @@ async function loadTilesFromSheets() {
         const validTiles = tiles.filter(tile => tile.id && tile.type);
         
         STATE.tiles = validTiles;
-        saveTilesToStorage();
+        // Don't save to localStorage - too much data causes quota errors
+        // saveTilesToStorage();
         renderTiles();
         console.log('Loaded', validTiles.length, 'tiles from Google Sheets Web App');
     } catch (error) {
@@ -504,6 +505,12 @@ function createTileElement(tile) {
     div.dataset.id = tile.id;
     div.dataset.size = tile.size;
     div.dataset.type = tile.type;
+    
+    // Set draggable if in edit mode
+    if (STATE.editMode) {
+        div.classList.add('edit-mode');
+        div.draggable = true;
+    }
 
     // Determine what to display
     const hasImage = tile.upload && tile.upload.trim() !== '';
