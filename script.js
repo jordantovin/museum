@@ -164,14 +164,28 @@ async function initApp() {
     document.querySelectorAll('.filter-option').forEach(btn => {
         btn.addEventListener('click', function() {
             if (this.dataset.sort) {
+                // Handle sort selection
                 STATE.currentSort = this.dataset.sort;
+                
+                // Update selected state for sort buttons
+                document.querySelectorAll('[data-sort]').forEach(b => b.classList.remove('selected'));
+                this.classList.add('selected');
             } else if (this.dataset.filter) {
+                // Handle filter selection  
                 STATE.currentFilter = this.dataset.filter;
+                
+                // Update checked state for filter buttons
+                document.querySelectorAll('[data-filter]').forEach(b => b.classList.remove('checked'));
+                this.classList.add('checked');
             }
             renderTiles();
-            filterMenu.classList.add('hidden');
+            // Don't close menu immediately so user can see selection
         });
     });
+    
+    // Initialize selected states
+    document.querySelector(`[data-sort="${STATE.currentSort}"]`)?.classList.add('selected');
+    document.querySelector(`[data-filter="${STATE.currentFilter}"]`)?.classList.add('checked');
     
     // Border toggle
     if (toggleBorders) {
