@@ -37,14 +37,43 @@ function initFullscreenAndEditing() {
         const viewer = document.getElementById('fullscreenViewer');
         if (!viewer || viewer.classList.contains('hidden')) return;
         
+        // Check if user is editing text
+        const isEditing = document.activeElement.tagName === 'INPUT' || 
+                         document.activeElement.tagName === 'TEXTAREA' ||
+                         document.activeElement.isContentEditable;
+        
+        // Text formatting shortcuts (Cmd/Ctrl + B/I/U) when editing
+        if (isEditing && (e.metaKey || e.ctrlKey)) {
+            if (e.key === 'b') {
+                e.preventDefault();
+                document.execCommand('bold');
+                return;
+            } else if (e.key === 'i') {
+                e.preventDefault();
+                document.execCommand('italic');
+                return;
+            } else if (e.key === 'u') {
+                e.preventDefault();
+                document.execCommand('underline');
+                return;
+            }
+        }
+        
+        // Don't navigate with arrow keys when editing text
+        if (isEditing && (e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
+            // Allow normal text navigation
+            return;
+        }
+        
+        // Fullscreen navigation (only when not editing)
         if (e.key === 'Escape') {
             viewer.classList.add('hidden');
             if (window.MUSEUM_RIGHTCLICK) {
                 window.MUSEUM_RIGHTCLICK.hideContextMenu();
             }
-        } else if (e.key === 'ArrowRight') {
+        } else if (e.key === 'ArrowRight' && !isEditing) {
             navigateFullscreen(1);
-        } else if (e.key === 'ArrowLeft') {
+        } else if (e.key === 'ArrowLeft' && !isEditing) {
             navigateFullscreen(-1);
         }
     });
