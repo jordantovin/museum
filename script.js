@@ -178,6 +178,7 @@ async function initApp() {
                 } else {
                     // Remove "all" if another filter is selected
                     STATE.currentFilters = STATE.currentFilters.filter(f => f !== 'all');
+                    document.querySelector('[data-filter="all"]')?.classList.remove('checked');
                     
                     // Toggle this filter
                     if (STATE.currentFilters.includes(filterValue)) {
@@ -195,6 +196,8 @@ async function initApp() {
                         STATE.currentFilters = ['all'];
                         document.querySelector('[data-filter="all"]')?.classList.add('checked');
                     }
+                    
+                    console.log('Current filters:', STATE.currentFilters);
                 }
             }
             renderTiles();
@@ -614,6 +617,8 @@ function createTileElement(tile) {
     } else if (tile.type === 'place') {
         overlayContent = `<div class="tile-overlay-title">${tile.title || ''}</div>`;
     } else if (tile.type === 'post') {
+        overlayContent = `<div class="tile-overlay-title">${tile.title || ''}</div>`;
+    } else if (tile.type === 'article') {
         overlayContent = `<div class="tile-overlay-title">${tile.title || ''}</div>`;
     }
 
