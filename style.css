@@ -651,10 +651,12 @@ input, textarea, button, select {
     height: 90%;
     gap: 40px;
     align-items: center;
+    overflow: hidden;
 }
 
 .fullscreen-image-container {
-    flex: 1;
+    flex: 0 0 50%;
+    max-width: 50%;
     height: 100%;
     display: flex;
     align-items: center;
