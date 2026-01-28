@@ -1,13 +1,22 @@
-/* Search Bar Styles */
-.search-container {
-    position: fixed;
-    top: 80px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 1000;
-    width: 90%;
-    max-width: 700px;
-    pointer-events: auto;
+/* Search Bar Styles - Integrated in Header */
+.museum-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+}
+
+.header-left {
+    flex-shrink: 0;
+}
+
+.header-center {
+    flex: 1;
+    max-width: 600px;
+}
+
+.header-right {
+    flex-shrink: 0;
 }
 
 .search-box {
@@ -17,44 +26,36 @@
 
 #searchInput {
     width: 100%;
-    padding: 20px 60px 20px 24px;
-    font-size: 20px;
+    padding: 12px 45px 12px 20px;
+    font-size: 16px;
     border: 2px solid #ddd;
     border-radius: 50px;
     outline: none;
     font-family: Helvetica, 'Helvetica Neue', Arial, sans-serif;
     background: white;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
     transition: all 0.3s ease;
-    pointer-events: auto;
 }
 
 #searchInput:focus {
     border-color: #007AFF;
-    box-shadow: 0 8px 24px rgba(0, 122, 255, 0.15);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
 }
 
 #searchInput::placeholder {
     color: #999;
 }
 
-.search-buttons {
+#clearSearch {
+    display: none;
     position: absolute;
     right: 12px;
     top: 50%;
     transform: translateY(-50%);
-    display: flex;
-    gap: 8px;
-    pointer-events: auto;
-}
-
-#clearSearch {
-    display: none;
     background: transparent;
     border: none;
-    padding: 8px 12px;
+    padding: 4px 8px;
     cursor: pointer;
-    font-size: 28px;
+    font-size: 24px;
     color: #999;
     transition: color 0.2s;
     font-weight: 300;
@@ -65,45 +66,49 @@
     color: #333;
 }
 
-/* Adjust main grid to account for search bar */
+/* Remove old search container styles */
+.search-container {
+    display: none;
+}
+
+/* Adjust main grid - no extra padding needed */
 .museum-main {
-    padding-top: 160px;
+    padding-top: 0;
 }
 
 /* Responsive adjustments */
+@media (max-width: 1024px) {
+    .header-center {
+        max-width: 400px;
+    }
+}
+
 @media (max-width: 768px) {
-    .search-container {
-        width: 95%;
+    .museum-header {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+    
+    .header-center {
+        order: 3;
+        flex: 1 1 100%;
         max-width: none;
-        top: 70px;
     }
     
     #searchInput {
-        padding: 16px 50px 16px 20px;
-        font-size: 16px;
-    }
-    
-    .museum-main {
-        padding-top: 140px;
+        padding: 10px 40px 10px 16px;
+        font-size: 15px;
     }
 }
 
 @media (max-width: 480px) {
-    .search-container {
-        top: 65px;
-    }
-    
     #searchInput {
-        padding: 14px 45px 14px 16px;
-        font-size: 15px;
+        padding: 10px 40px 10px 14px;
+        font-size: 14px;
     }
     
     #clearSearch {
-        font-size: 24px;
-        padding: 6px 10px;
-    }
-    
-    .museum-main {
-        padding-top: 120px;
+        font-size: 20px;
+        padding: 4px 6px;
     }
 }
