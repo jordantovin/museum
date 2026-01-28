@@ -2,19 +2,35 @@
 
 function initSearch() {
     const searchInput = document.getElementById('searchInput');
-    const searchBtn = document.getElementById('searchBtn');
     const clearBtn = document.getElementById('clearSearch');
     
-    if (!searchInput) return;
-    
-    // Search on button click
-    if (searchBtn) {
-        searchBtn.addEventListener('click', performSearch);
+    if (!searchInput) {
+        console.log('Search input not found');
+        return;
     }
+    
+    console.log('Search initialized');
+    
+    // Search as user types (with small delay)
+    let searchTimeout;
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        
+        // Show/hide clear button
+        if (clearBtn) {
+            clearBtn.style.display = this.value ? 'block' : 'none';
+        }
+        
+        // Search after 300ms delay
+        searchTimeout = setTimeout(() => {
+            performSearch();
+        }, 300);
+    });
     
     // Search on Enter key
     searchInput.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
+            clearTimeout(searchTimeout);
             performSearch();
         }
     });
@@ -23,13 +39,6 @@ function initSearch() {
     if (clearBtn) {
         clearBtn.addEventListener('click', clearSearch);
     }
-    
-    // Show/hide clear button
-    searchInput.addEventListener('input', function() {
-        if (clearBtn) {
-            clearBtn.style.display = this.value ? 'block' : 'none';
-        }
-    });
 }
 
 function performSearch() {
