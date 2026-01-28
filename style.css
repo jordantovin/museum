@@ -628,6 +628,7 @@ input, textarea, button, select {
 }
 
 /* Fullscreen Viewer */
+
 .fullscreen-viewer {
     position: fixed;
     top: 0;
@@ -651,27 +652,25 @@ input, textarea, button, select {
     height: 90%;
     gap: 40px;
     align-items: center;
-    overflow: hidden;
 }
 
+/* Image column */
+
 .fullscreen-image-container {
-    flex: 0 0 50%;
-    max-width: 50%;
+    flex: 1;
     height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.fullscreen-image-container {
-    flex: 0 0 50%;
-    max-width: 50%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
+.fullscreen-image-horizontal {
+    max-width: 100%;
+    max-height: 85vh;
+    object-fit: contain;
 }
+
+/* Info column */
 
 .fullscreen-info-container {
     flex: 1;
@@ -688,23 +687,17 @@ input, textarea, button, select {
     font-weight: 500;
     margin: 0 0 8px 0;
     color: black;
-    padding: 0;
-    text-align: left;
 }
 
 .fullscreen-date {
     font-size: 18px;
     color: #666;
-    margin: 0 0 24px 0 !important;
+    margin: 0 0 24px 0;
     font-weight: 400;
-    padding: 0;
-    text-align: left;
 }
 
 .fullscreen-metadata {
     margin: 0 0 20px 0;
-    padding: 0;
-    text-align: left;
 }
 
 .fullscreen-info-container p {
@@ -712,8 +705,6 @@ input, textarea, button, select {
     margin: 16px 0;
     line-height: 1.6;
     color: #333;
-    padding: 0;
-    text-align: left;
 }
 
 .fullscreen-info-container strong {
@@ -721,69 +712,28 @@ input, textarea, button, select {
     color: black;
 }
 
-.fullscreen-content,
-.fullscreen-content-box {
-    margin: 30px 0 0 0;
-    padding: 0;
-    text-align: left;
+/* About section */
+
+.fullscreen-content {
+    margin-top: 30px;
 }
 
-.fullscreen-content-box h3,
 .fullscreen-content h3 {
     margin: 0 0 15px 0;
     font-size: 20px;
     font-weight: 600;
     color: black;
-    padding: 0;
-    text-align: left;
 }
 
-.fullscreen-content-box p,
 .fullscreen-content p {
     margin: 0;
-    padding: 0;
     white-space: pre-wrap;
     line-height: 1.6;
     color: #333;
     font-size: 18px;
 }
 
-.fullscreen-content-box.empty {
-    display: none;
-}
-
-.fullscreen-content {
-    margin: 30px 0 0 0;
-    padding: 0;
-    text-align: left;
-    width: auto;
-    max-width: none;
-}
-
-.fullscreen-image {
-    max-width: 100%;
-    max-height: 80vh;
-    object-fit: contain;
-}
-
-.fullscreen-info {
-    color: white;
-    text-align: center;
-    margin-top: 24px;
-    font-family: Helvetica, 'Helvetica Neue', Arial, sans-serif;
-}
-
-.fullscreen-info h2 {
-    font-size: 32px;
-    font-weight: 500;
-    margin-bottom: 12px;
-}
-
-.fullscreen-info p {
-    font-size: 18px;
-    margin: 8px 0;
-    opacity: 0.9;
-}
+/* Close button */
 
 .fullscreen-close {
     position: absolute;
@@ -808,6 +758,7 @@ input, textarea, button, select {
     background: white;
     color: black;
 }
+
 
 /* Context Menu */
 .context-menu {
