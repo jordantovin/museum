@@ -4,7 +4,7 @@
 // Configuration
 const CONFIG = {
     csvUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTKj5a8JIDfxvaw-5pPEb5nHfu_a-jZS9lFgrHqvv6JjzCTbpmMTyxVxqF5yrZPjkH961zi-u_HvQwz/pub?output=csv',
-    webAppUrl: 'https://script.google.com/macros/s/AKfycbygAEOjuULc7qyPoT9NADZgBf1GkL_8xI0sOpocVxmWX7nU1TOfXslFhpuk-6X7qGg/exec',
+    webAppUrl: 'https://script.google.com/macros/s/AKfycbwWunN7dhoswN3Q67kmhOFdT6Kj7UJtC6ACwT5CPpmp87DxR02ywssI8r6aJn7qFg4/exec',
     sheetNames: {
         object: 'Object',
         sticker: 'Sticker',
@@ -21,7 +21,7 @@ const CONFIG = {
 const STATE = {
     tiles: [],
     currentSort: 'newest',
-    currentFilter: 'all',
+    currentFilters: ['all'], // Changed to array to support multiple filters
     editMode: false,
     selectedTileType: null,
     selectedSize: '1x1',
@@ -167,12 +167,35 @@ async function initApp() {
                 document.querySelectorAll('[data-sort]').forEach(b => b.classList.remove('selected'));
                 this.classList.add('selected');
             } else if (this.dataset.filter) {
-                // Handle filter selection  
-                STATE.currentFilter = this.dataset.filter;
+                // Handle filter selection (multiple allowed)
+                const filterValue = this.dataset.filter;
                 
-                // Update checked state for filter buttons
-                document.querySelectorAll('[data-filter]').forEach(b => b.classList.remove('checked'));
-                this.classList.add('checked');
+                if (filterValue === 'all') {
+                    // If "All" is clicked, clear other filters
+                    STATE.currentFilters = ['all'];
+                    document.querySelectorAll('[data-filter]').forEach(b => b.classList.remove('checked'));
+                    this.classList.add('checked');
+                } else {
+                    // Remove "all" if another filter is selected
+                    STATE.currentFilters = STATE.currentFilters.filter(f => f !== 'all');
+                    
+                    // Toggle this filter
+                    if (STATE.currentFilters.includes(filterValue)) {
+                        // Remove filter
+                        STATE.currentFilters = STATE.currentFilters.filter(f => f !== filterValue);
+                        this.classList.remove('checked');
+                    } else {
+                        // Add filter
+                        STATE.currentFilters.push(filterValue);
+                        this.classList.add('checked');
+                    }
+                    
+                    // If no filters selected, default to "all"
+                    if (STATE.currentFilters.length === 0) {
+                        STATE.currentFilters = ['all'];
+                        document.querySelector('[data-filter="all"]')?.classList.add('checked');
+                    }
+                }
             }
             renderTiles();
             // Menu stays open - don't close
@@ -181,7 +204,9 @@ async function initApp() {
     
     // Initialize selected states
     document.querySelector(`[data-sort="${STATE.currentSort}"]`)?.classList.add('selected');
-    document.querySelector(`[data-filter="${STATE.currentFilter}"]`)?.classList.add('checked');
+    STATE.currentFilters.forEach(filter => {
+        document.querySelector(`[data-filter="${filter}"]`)?.classList.add('checked');
+    });
     
     // Border toggle
     if (toggleBorders) {
@@ -490,24 +515,15 @@ function renderTiles() {
     let tilesToRender = [...STATE.tiles];
     console.log('Tiles before filter:', tilesToRender.length);
 
-    // Apply filter
-    if (STATE.currentFilter !== 'all') {
-        tilesToRender = tilesToRender.filter(tile => tile.type === STATE.currentFilter);
-        console.log('Tiles after filter (' + STATE.currentFilter + '):', tilesToRender.length);
+    // Apply filter (multiple filters supported)
+    if (!STATE.currentFilters.includes('all')) {
+        tilesToRender = tilesToRender.filter(tile => STATE.currentFilters.includes(tile.type));
+        console.log('Tiles after filter (' + STATE.currentFilters.join(', ') + '):', tilesToRender.length);
     }
 
     // Apply sort
     if (STATE.currentSort === 'newest') {
-        tilesToRender.sort((a, b) => {
-            const dateA = a.date || a.createdAt || '';
-            const dateB = b.date || b.createdAt || '';
-            const result = new Date(dateB) - new Date(dateA);
-            if (a.title?.includes('McDonald') || b.title?.includes('McDonald') || 
-                a.title?.includes('Hikes') || b.title?.includes('Hikes')) {
-                console.log('Comparing:', a.title, 'date:', dateA, 'vs', b.title, 'date:', dateB, 'result:', result);
-            }
-            return result;
-        });
+        tilesToRender.sort(() => Math.random() - 0.5);
     } else if (STATE.currentSort === 'oldest') {
         tilesToRender.sort((a, b) => {
             const dateA = a.date || a.createdAt || '';
