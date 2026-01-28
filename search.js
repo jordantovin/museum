@@ -52,34 +52,19 @@ function performSearch() {
     
     console.log('Searching for:', query);
     
-    // Filter tiles based on search query
+    // Filter tiles based on search query - search ALL properties
     const filteredTiles = STATE.tiles.filter(tile => {
-        // Search in title
-        if (tile.title && tile.title.toLowerCase().includes(query)) return true;
-        
-        // Search in artist
-        if (tile.artist && tile.artist.toLowerCase().includes(query)) return true;
-        
-        // Search in location
-        if (tile.location && tile.location.toLowerCase().includes(query)) return true;
-        
-        // Search in content
-        if (tile.content && tile.content.toLowerCase().includes(query)) return true;
-        
-        // Search in media
-        if (tile.media && tile.media.toLowerCase().includes(query)) return true;
-        
-        // Search in type
-        if (tile.type && tile.type.toLowerCase().includes(query)) return true;
-        
-        // Search in link
-        if (tile.link && tile.link.toLowerCase().includes(query)) return true;
-        
-        // Search in first name
-        if (tile.firstName && tile.firstName.toLowerCase().includes(query)) return true;
-        
-        // Search in last name
-        if (tile.lastName && tile.lastName.toLowerCase().includes(query)) return true;
+        // Search through every property in the tile object
+        for (let key in tile) {
+            if (tile.hasOwnProperty(key)) {
+                const value = tile[key];
+                
+                // Only search string values
+                if (typeof value === 'string' && value.toLowerCase().includes(query)) {
+                    return true;
+                }
+            }
+        }
         
         return false;
     });
