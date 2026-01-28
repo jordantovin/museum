@@ -139,28 +139,24 @@ function logout() {
 }
 
 function showAdminControls() {
-    // Show add, edit, and filter buttons
+    // Show add and edit buttons (filter is always visible)
     const addBtn = document.getElementById('addBtn');
     const editBtn = document.getElementById('editBtn');
-    const filterBtn = document.getElementById('filterBtn');
     
     if (addBtn) addBtn.style.display = 'flex';
     if (editBtn) editBtn.style.display = 'flex';
-    if (filterBtn) filterBtn.style.display = 'flex';
     
     // Update login button to show logout
     updateLoginButtonToLogout();
 }
 
 function hideAdminControls() {
-    // Hide add, edit, and filter buttons
+    // Hide add and edit buttons (filter stays visible)
     const addBtn = document.getElementById('addBtn');
     const editBtn = document.getElementById('editBtn');
-    const filterBtn = document.getElementById('filterBtn');
     
     if (addBtn) addBtn.style.display = 'none';
     if (editBtn) editBtn.style.display = 'none';
-    if (filterBtn) filterBtn.style.display = 'none';
 }
 
 function isLoggedIn() {
