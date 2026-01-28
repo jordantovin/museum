@@ -651,11 +651,10 @@ input, textarea, button, select {
     width: 90%;
     height: 90%;
     gap: 40px;
-    align-items: center;
+    align-items: stretch;
 }
 
 /* Image column */
-
 .fullscreen-image-container {
     flex: 1;
     height: 100%;
