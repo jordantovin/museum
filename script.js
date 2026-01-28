@@ -523,7 +523,11 @@ function renderTiles() {
 
     // Apply sort
     if (STATE.currentSort === 'newest') {
-        tilesToRender.sort(() => Math.random() - 0.5);
+        tilesToRender.sort((a, b) => {
+            const dateA = a.date || a.createdAt || '';
+            const dateB = b.date || b.createdAt || '';
+            return new Date(dateB) - new Date(dateA);
+        });
     } else if (STATE.currentSort === 'oldest') {
         tilesToRender.sort((a, b) => {
             const dateA = a.date || a.createdAt || '';
