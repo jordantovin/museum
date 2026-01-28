@@ -210,7 +210,6 @@ function showFullscreen(tile, index) {
         const content = tile.content || '';
         if (content) {
             html += '<div class="fullscreen-content">';
-            html += `<h3>About</h3>`;
             html += `<p>${content}</p>`;
             html += '</div>';
         }
@@ -270,7 +269,7 @@ function editInFullscreen(tileId) {
             // Save the changes
             if (titleElement) tile.title = titleElement.textContent.trim();
             if (dateElement) tile.date = dateElement.textContent.trim();
-            if (contentElement) tile.content = contentElement.textContent.trim();
+            if (contentElement) tile.content = contentElement.innerHTML.trim();
             
             tile.updatedAt = new Date().toISOString();
             
